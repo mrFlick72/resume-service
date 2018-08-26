@@ -1,0 +1,23 @@
+version: "3.0"
+
+services:
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - graphana
+  graphite:
+    image: graphiteapp/graphite-statsd
+    ports:
+      - "80:80"
+      - "2003:2003"
+      - "2004:2004"
+      - "8126:8126"
+      - "8125:8125/udp"
+    networks:
+      - graphana
+
+networks:
+  graphana:
+    driver: bridge
