@@ -24,7 +24,7 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
 
         val photoData =
-                if (personalDetails.photo.content.size != 0)
+                if (personalDetails.photo.content.isNotEmpty())
                     Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resume-id").`is`(resumeId))) }
                             .map {
                                 personalDetails.photo.content.inputStream().use {
