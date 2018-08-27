@@ -15,16 +15,13 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query.query
+import org.springframework.data.mongodb.gridfs.GridFsOperations
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.test.context.junit4.SpringRunner
+import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.time.Duration
 import java.time.LocalDate
-import org.springframework.data.mongodb.gridfs.GridFsOperations
-import org.springframework.test.annotation.DirtiesContext
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.util.*
 
 
@@ -58,7 +55,7 @@ class MongoPersonalDetailsRepositoryTest {
                 "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                 LocalDate.now(), "Italy", Sex.M, "")
 
-        mongoPersonalDetailsRepository.save(resumeId, personalDetails)
+        mongoPersonalDetailsRepository.save(resumeId, Mono.just(personalDetails))
                 .toMono().blockOptional().ifPresent {
                     Assert.assertThat(it, `is`(personalDetails))
                 }
@@ -83,7 +80,7 @@ class MongoPersonalDetailsRepositoryTest {
                             "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                             LocalDate.now(), "Italy", Sex.M, "")
 
-                    mongoPersonalDetailsRepository.save(resumeId, personalDetails)
+                    mongoPersonalDetailsRepository.save(resumeId, Mono.just(personalDetails))
                             .toMono().blockOptional().ifPresent {
                                 Assert.assertThat(it, `is`(personalDetails))
                             }
@@ -111,7 +108,7 @@ class MongoPersonalDetailsRepositoryTest {
                             "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                             LocalDate.now(), "Italy", Sex.NONE, "")
 
-                    mongoPersonalDetailsRepository.save(resumeId, personalDetails)
+                    mongoPersonalDetailsRepository.save(resumeId, Mono.just(personalDetails))
                             .toMono().blockOptional().ifPresent {
                                 Assert.assertThat(it, `is`(personalDetails))
                             }

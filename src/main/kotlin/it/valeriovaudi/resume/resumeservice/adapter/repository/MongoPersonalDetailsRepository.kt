@@ -11,35 +11,40 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 import java.time.Duration
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
                                      private val gridFsTemplate: GridFsTemplate) : PersonalDetailsRepository {
 
-    override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
+    override fun save(resumeId: String, personalDetails: Publisher<PersonalDetails>): Publisher<PersonalDetails> =
 
-        val savedPersonalDetailsPersistanceModel =
-                mongoTemplate.save(PersonalDetailsPersistanceModel.fromDomainToPersistanceModel(resumeId, personalDetails))
-                        .timeout(Duration.ofMinutes(1))
+            personalDetails.toMono().flatMap {
+
+                val personalDetails = it;
+                val savedPersonalDetailsPersistanceModel =
+                        mongoTemplate.save(PersonalDetailsPersistanceModel.fromDomainToPersistanceModel(resumeId, personalDetails))
+                                .timeout(Duration.ofMinutes(1))
 
 
-        val photoData =
-                if (personalDetails.photo.content.isNotEmpty())
-                    Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resume-id").`is`(resumeId))) }
-                            .map {
-                                personalDetails.photo.content.inputStream().use {
-                                    gridFsTemplate.store(it,
-                                            resumeId,
-                                            personalDetails.photo.fileExtension,
-                                            mutableMapOf("resume-id" to resumeId, "fileName" to personalDetails.photo.fileName))
-                                }
-                            }
-                else Mono.empty()
+                val photoData =
+                        if (personalDetails.photo.content.isNotEmpty())
+                            Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resume-id").`is`(resumeId))) }
+                                    .map {
+                                        personalDetails.photo.content.inputStream().use {
+                                            gridFsTemplate.store(it,
+                                                    resumeId,
+                                                    personalDetails.photo.fileExtension,
+                                                    mutableMapOf("resume-id" to resumeId, "fileName" to personalDetails.photo.fileName))
+                                        }
+                                    }
+                        else Mono.empty()
 
-        return Mono.zip(savedPersonalDetailsPersistanceModel, photoData)
-                .map { personalDetails }
-                .onErrorReturn(PersonalDetails.emptyPersonalDetails())
-    }
+                Mono.zip(savedPersonalDetailsPersistanceModel, photoData)
+                        .map { personalDetails }
+                        .onErrorReturn(PersonalDetails.emptyPersonalDetails())
+            }
+
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =
             mongoTemplate.findOne(Query.query(Criteria.where("_id").`is`(resumeId)),

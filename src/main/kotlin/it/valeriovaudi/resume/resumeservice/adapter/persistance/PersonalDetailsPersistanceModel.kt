@@ -22,7 +22,7 @@ data class PersonalDetailsPersistanceModel(@Id var id: String,
                                            var sex: String,
                                            var taxCode: String) {
     companion object {
-        fun fromDomainToPersistanceModel(resumeId : String, personalDetails: PersonalDetails) =
+        fun fromDomainToPersistanceModel(resumeId: String, personalDetails: PersonalDetails) =
                 PersonalDetailsPersistanceModel(
                         id = resumeId,
                         firstName = personalDetails.firstName,
@@ -37,10 +37,6 @@ data class PersonalDetailsPersistanceModel(@Id var id: String,
                         state = personalDetails.state,
                         taxCode = personalDetails.taxCode,
                         zip = personalDetails.zip)
-
-        fun fromPersistanceModelToDomain() {
-
-        }
     }
 }
 

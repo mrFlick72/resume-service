@@ -1,4 +1,5 @@
 package it.valeriovaudi.resume.resumeservice.domain.model
 
-data class Resume(private val language: Language,
-                  private val personalDetails: PersonalDetails)
+data class Resume(val id: String,
+                  val language: Language,
+                  val personalDetails: PersonalDetails)

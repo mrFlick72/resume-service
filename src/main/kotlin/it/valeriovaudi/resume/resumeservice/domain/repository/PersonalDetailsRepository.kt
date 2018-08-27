@@ -9,6 +9,6 @@ interface PersonalDetailsRepository {
 
     fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails>
 
-    fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails>
+    fun save(resumeId: String, personalDetails: Publisher<PersonalDetails>): Publisher<PersonalDetails>
 
 }
