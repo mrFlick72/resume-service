@@ -29,13 +29,13 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
                 val photoData =
                         if (personalDetails.photo.content.isNotEmpty())
-                            Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resume-id").`is`(resumeId))) }
+                            Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))) }
                                     .map {
                                         personalDetails.photo.content.inputStream().use {
                                             gridFsTemplate.store(it,
                                                     resumeId,
                                                     personalDetails.photo.fileExtension,
-                                                    mutableMapOf("resume-id" to resumeId, "fileName" to personalDetails.photo.fileName))
+                                                    mutableMapOf("resumeId" to resumeId))
                                         }
                                     }
                         else Mono.empty()
@@ -67,17 +67,14 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
 
     override fun findOne(resumeId: String): Publisher<PersonalDetails> =
-            Mono.zip(mongoTemplate.findOne(Query.query(Criteria.where("_id").`is`(resumeId)),
+            Mono.zip(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                     PersonalDetailsPersistanceModel::class.java),
-                    Mono.fromCallable { gridFsTemplate.getResource(resumeId) },
-                    Mono.fromCallable { gridFsTemplate.findOne(Query.query(Criteria.where("metadata.resume-id").`is`(resumeId))) })
+                    Mono.fromCallable { gridFsTemplate.getResource(resumeId) })
                     .map {
                         val personalData = it.t1
                         val resource = it.t2
-                        val fileName: String = it.t3.metadata["fileName"] as String
 
                         val photo = PersonalDetailsPhoto(content = resource.inputStream.readAllBytes(),
-                                fileName = fileName,
                                 fileExtension = resource.contentType)
 
                         PersonalDetails(photo = photo,

@@ -61,12 +61,12 @@ class MongoPersonalDetailsRepositoryTest {
                 }
 
         println("details")
-        Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("_id").`is`(resumeId)),
+        Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
                 PersonalDetailsPersistanceModel::class.java)
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
-        Assert.assertNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resume-id").`is`(resumeId))))
+        Assert.assertNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
     }
 
     @Test
@@ -75,7 +75,7 @@ class MongoPersonalDetailsRepositoryTest {
 
         this::class.java.classLoader.getResourceAsStream("barca-a-vela.jpg")
                 .use {
-                    val personalDetails = PersonalDetails(PersonalDetailsPhoto(it.readAllBytes(), "barca-a-vela", "jpg"),
+                    val personalDetails = PersonalDetails(PersonalDetailsPhoto(it.readAllBytes(), "jpg"),
                             "Valerio", "Vaudi", "Ennio Ferrari 30 street",
                             "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                             LocalDate.now(), "Italy", Sex.M, "")
@@ -87,12 +87,12 @@ class MongoPersonalDetailsRepositoryTest {
 
 
                     println("details")
-                    Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("_id").`is`(resumeId)),
+                    Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
                             PersonalDetailsPersistanceModel::class.java)
                             .block(Duration.ofMinutes(2)))
 
                     println("photo")
-                    Assert.assertNotNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resume-id").`is`(resumeId))))
+                    Assert.assertNotNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
                     Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
                 }
     }
@@ -103,7 +103,7 @@ class MongoPersonalDetailsRepositoryTest {
 
         this::class.java.classLoader.getResourceAsStream("barca-a-vela.jpg")
                 .use {
-                    val personalDetails = PersonalDetails(PersonalDetailsPhoto(it.readAllBytes(), "barca-a-vela", "jpg"),
+                    val personalDetails = PersonalDetails(PersonalDetailsPhoto(it.readAllBytes(), "jpg"),
                             "Valerio", "Vaudi", "Ennio Ferrari 30 street",
                             "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                             LocalDate.now(), "Italy", Sex.NONE, "")
@@ -118,7 +118,6 @@ class MongoPersonalDetailsRepositoryTest {
 
                     println(actual!!.photo.content.size)
                     println(actual.photo.fileExtension)
-                    println(actual.photo.fileName)
                     println(actual.firstName)
                 }
     }

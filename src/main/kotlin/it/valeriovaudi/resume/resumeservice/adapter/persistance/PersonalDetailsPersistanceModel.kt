@@ -8,7 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
 
 @Document(collection = "personalDetails")
-data class PersonalDetailsPersistanceModel(@Id var id: String,
+data class PersonalDetailsPersistanceModel(@Id var id: String? = null,
+                                           var resumeId: String,
                                            var firstName: String,
                                            var lastName: String,
                                            var address: String,
@@ -24,7 +25,7 @@ data class PersonalDetailsPersistanceModel(@Id var id: String,
     companion object {
         fun fromDomainToPersistanceModel(resumeId: String, personalDetails: PersonalDetails) =
                 PersonalDetailsPersistanceModel(
-                        id = resumeId,
+                        resumeId = resumeId,
                         firstName = personalDetails.firstName,
                         lastName = personalDetails.lastName,
                         address = personalDetails.address,
