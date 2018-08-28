@@ -17,18 +17,8 @@ data class PersonalDetails(val photo: PersonalDetailsPhoto,
                            val taxCode: String) {
     companion object {
         fun emptyPersonalDetails() = PersonalDetails(photo = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
-                firstName = "",
-                lastName = "",
-                address = "",
-                zip = "",
-                city = "",
-                region = "",
-                mail = "",
-                mobile = "",
-                birthDate = LocalDate.MIN,
-                state = "",
-                sex = Sex.NONE,
-                taxCode = "")
+                firstName = "", lastName = "", address = "", zip = "", city = "", region = "", mail = "",
+                mobile = "", birthDate = LocalDate.MIN, state = "", sex = Sex.NONE, taxCode = "")
     }
 }
 

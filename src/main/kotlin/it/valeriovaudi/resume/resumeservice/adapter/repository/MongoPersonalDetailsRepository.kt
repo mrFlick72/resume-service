@@ -51,18 +51,12 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                     PersonalDetailsPersistanceModel::class.java)
                     .map {
                         PersonalDetails(photo = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
-                                zip = it.zip,
-                                taxCode = it.taxCode,
-                                state = it.state,
-                                sex = Sex.valueOf(it.sex),
-                                region = it.region,
-                                mobile = it.mobile,
-                                mail = it.mail,
-                                city = it.city,
-                                birthDate = it.birthDate,
-                                address = it.address,
-                                lastName = it.lastName,
-                                firstName = it.firstName)
+                                zip = it.zip, taxCode = it.taxCode,
+                                state = it.state, sex = Sex.valueOf(it.sex),
+                                region = it.region, mobile = it.mobile,
+                                mail = it.mail, city = it.city,
+                                birthDate = it.birthDate, address = it.address,
+                                lastName = it.lastName, firstName = it.firstName)
                     }
 
 
@@ -78,17 +72,11 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                                 fileExtension = resource.contentType)
 
                         PersonalDetails(photo = photo,
-                                zip = personalData.zip,
-                                taxCode = personalData.taxCode,
-                                state = personalData.state,
-                                sex = Sex.valueOf(personalData.sex),
-                                region = personalData.region,
-                                mobile = personalData.mobile,
-                                mail = personalData.mail,
-                                city = personalData.city,
-                                birthDate = personalData.birthDate,
-                                address = personalData.address,
-                                lastName = personalData.lastName,
-                                firstName = personalData.firstName)
+                                zip = personalData.zip, taxCode = personalData.taxCode,
+                                state = personalData.state, sex = Sex.valueOf(personalData.sex),
+                                region = personalData.region, mobile = personalData.mobile,
+                                mail = personalData.mail, city = personalData.city,
+                                birthDate = personalData.birthDate, address = personalData.address,
+                                lastName = personalData.lastName, firstName = personalData.firstName)
                     }
 }
