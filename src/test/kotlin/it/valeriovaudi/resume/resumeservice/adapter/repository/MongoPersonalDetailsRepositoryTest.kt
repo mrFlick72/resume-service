@@ -56,7 +56,7 @@ class MongoPersonalDetailsRepositoryTest {
                 "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                 LocalDate.now(), "Italy", Sex.M, "")
 
-        mongoPersonalDetailsRepository.save(resumeId, Mono.just(personalDetails))
+        mongoPersonalDetailsRepository.save(resumeId, personalDetails)
                 .toMono().blockOptional().ifPresent {
                     Assert.assertThat(it, `is`(personalDetails))
                 }
@@ -81,7 +81,7 @@ class MongoPersonalDetailsRepositoryTest {
                             "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                             LocalDate.now(), "Italy", Sex.M, "")
 
-                    mongoPersonalDetailsRepository.save(resumeId, Mono.just(personalDetails))
+                    mongoPersonalDetailsRepository.save(resumeId, personalDetails)
                             .toMono().blockOptional().ifPresent {
                                 Assert.assertThat(it, `is`(personalDetails))
                             }
@@ -109,7 +109,7 @@ class MongoPersonalDetailsRepositoryTest {
                             "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
                             LocalDate.now(), "Italy", Sex.NONE, "")
 
-                    mongoPersonalDetailsRepository.save(resumeId, Mono.just(personalDetails))
+                    mongoPersonalDetailsRepository.save(resumeId, personalDetails)
                             .toMono().blockOptional().ifPresent {
                                 Assert.assertThat(it, `is`(personalDetails))
                             }

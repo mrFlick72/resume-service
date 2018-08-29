@@ -10,39 +10,33 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
-import java.time.format.DateTimeFormatter
 
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
                                      private val gridFsTemplate: GridFsTemplate) : PersonalDetailsRepository {
 
-    val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
-    override fun save(resumeId: String, personalDetails: Publisher<PersonalDetails>): Publisher<PersonalDetails> =
+    override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
+        val savedPersonalDetailsPersistanceModel =
+                mongoTemplate.save(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails), "personalDetails")
 
-            personalDetails.toMono().flatMap {
-                val personalDetails = it;
-                val savedPersonalDetailsPersistanceModel =
-                        mongoTemplate.save(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails), "personalDetails")
+        val photoData =
+                if (personalDetails.photo.content.isNotEmpty())
+                    Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))) }
+                            .map {
+                                personalDetails.photo.content.inputStream().use {
+                                    gridFsTemplate.store(it,
+                                            resumeId,
+                                            personalDetails.photo.fileExtension,
+                                            mutableMapOf("resumeId" to resumeId))
+                                }
+                            }
+                else Mono.empty()
 
-                val photoData =
-                        if (personalDetails.photo.content.isNotEmpty())
-                            Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))) }
-                                    .map {
-                                        personalDetails.photo.content.inputStream().use {
-                                            gridFsTemplate.store(it,
-                                                    resumeId,
-                                                    personalDetails.photo.fileExtension,
-                                                    mutableMapOf("resumeId" to resumeId))
-                                        }
-                                    }
-                        else Mono.empty()
-
-                Mono.zip(savedPersonalDetailsPersistanceModel, photoData)
-                        .map { personalDetails }
-                        .onErrorReturn(PersonalDetails.emptyPersonalDetails())
-            }
+        return Mono.zip(savedPersonalDetailsPersistanceModel, photoData)
+                .map { personalDetails }
+                .onErrorReturn(PersonalDetails.emptyPersonalDetails())
+    }
 
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =

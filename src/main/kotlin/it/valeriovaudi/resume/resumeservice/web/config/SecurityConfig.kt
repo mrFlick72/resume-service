@@ -1,3 +1,4 @@
+/*
 package it.valeriovaudi.resume.resumeservice.web.config
 
 import org.springframework.context.annotation.Bean
@@ -39,3 +40,4 @@ class SecurityConfig {
     }
 
 }
+*/
