@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
+import reactor.core.publisher.onErrorResume
+import reactor.core.publisher.toMono
 
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
@@ -19,6 +21,7 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
     override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
         val savedPersonalDetailsPersistanceModel =
                 mongoTemplate.save(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails), "personalDetails")
+                        .onErrorResume { println("Error at ${it}"); Mono.just(Document())}
 
         val photoData =
                 if (personalDetails.photo.content.isNotEmpty())
@@ -31,16 +34,16 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                                             mutableMapOf("resumeId" to resumeId))
                                 }
                             }
-                else Mono.empty()
+                else Mono.just("")
 
         return Mono.zip(savedPersonalDetailsPersistanceModel, photoData)
-                .map { personalDetails }
+                .map { println("esecuzione dell inserimento"); personalDetails }
                 .onErrorReturn(PersonalDetails.emptyPersonalDetails())
     }
 
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =
-            mongoTemplate.findOne(Query.query(Criteria.where("_id").`is`(resumeId)),
+            mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                     Document::class.java, "personalDetails")
                     .map { PersonalDetailsMapper.fromDocumentToDomain(document = it) }
 

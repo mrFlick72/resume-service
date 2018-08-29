@@ -1,4 +1,3 @@
-/*
 package it.valeriovaudi.resume.resumeservice.web.config
 
 import org.springframework.context.annotation.Bean
@@ -22,7 +21,7 @@ class SecurityConfig {
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         http.csrf().disable()
                 .authorizeExchange()
-                .anyExchange().authenticated()
+                .anyExchange().permitAll()
                 .and()
                 .httpBasic().and()
                 .formLogin();
@@ -40,4 +39,3 @@ class SecurityConfig {
     }
 
 }
-*/

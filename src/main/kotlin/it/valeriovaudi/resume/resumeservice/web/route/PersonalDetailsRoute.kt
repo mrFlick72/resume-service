@@ -2,10 +2,13 @@ package it.valeriovaudi.resume.resumeservice.web.route
 
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
 import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
+import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation.Companion.fromDomainToRepresentation
 import org.springframework.context.support.beans
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 
 object PersonalDetailsRoute {
 
@@ -14,14 +17,23 @@ object PersonalDetailsRoute {
             val personalDetailsRepository = ref<PersonalDetailsRepository>()
 
             router {
+
+                GET("/resume/{resumeId}/personal-details")
+                {
+                    personalDetailsRepository.findOneWithoutPhoto(it.pathVariable("resumeId")).toMono()
+                            .map { PersonalDetailsRepresentation.fromDomainToRepresentation(it) }
+                            .flatMap { ServerResponse.ok().body(it.toMono(), PersonalDetailsRepresentation::class.java) }
+                }
+
                 POST("/resume/{resumeId}/personal-details")
                 {
                     val resumeId = it.pathVariable("resumeId")
                     it.bodyToMono(PersonalDetailsRepresentation::class.java)
                             .map { PersonalDetailsRepresentation.fromRepresentationToDomain(it) }
-                            .map { personalDetailsRepository.save(resumeId, it) }
+                            .flatMap { personalDetailsRepository.save(resumeId, it).toMono() }
                             .flatMap { ServerResponse.status(HttpStatus.CREATED).build() }
                 }
+
 
             }
         }

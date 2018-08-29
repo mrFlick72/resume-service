@@ -1,5 +1,8 @@
 spring:
   application:
     name: resume-servcie
+  data:
+    mongodb:
+      database: resume
 
 management.endpoints.web.exposure.include: "*"

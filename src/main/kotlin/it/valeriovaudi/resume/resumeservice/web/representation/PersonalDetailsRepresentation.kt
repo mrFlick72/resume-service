@@ -18,20 +18,38 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                                          var sex: Sex? = Sex.NONE,
                                          var taxCode: String? = "") {
     companion object {
-        fun fromRepresentationToDomain(personalDetails: PersonalDetailsRepresentation) =
-                PersonalDetails(photo = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
-                        firstName = personalDetails.firstName!!,
-                        lastName = personalDetails.lastName!!,
-                        address = personalDetails.address!!,
-                        birthDate = personalDetails.birthDate!!,
-                        city = personalDetails.city!!,
-                        mail = personalDetails.mail!!,
-                        mobile = personalDetails.mobile!!,
-                        region = personalDetails.region!!,
-                        sex = personalDetails.sex!!,
-                        state = personalDetails.state!!,
-                        taxCode = personalDetails.taxCode!!,
-                        zip = personalDetails.zip!!)
+        fun fromRepresentationToDomain(personalDetails: PersonalDetailsRepresentation): PersonalDetails  {
+            println(personalDetails)
+            return PersonalDetails(photo = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
+                    firstName = personalDetails.firstName!!,
+                    lastName = personalDetails.lastName!!,
+                    address = personalDetails.address!!,
+                    birthDate = personalDetails.birthDate!!,
+                    city = personalDetails.city!!,
+                    mail = personalDetails.mail!!,
+                    mobile = personalDetails.mobile!!,
+                    region = personalDetails.region!!,
+                    sex = personalDetails.sex!!,
+                    state = personalDetails.state!!,
+                    taxCode = personalDetails.taxCode!!,
+                    zip = personalDetails.zip!!)
+
+        }
+
+
+        fun fromDomainToRepresentation(personalDetails: PersonalDetails) =
+                PersonalDetailsRepresentation(firstName = personalDetails.firstName,
+                        lastName = personalDetails.lastName,
+                        address = personalDetails.address,
+                        birthDate = personalDetails.birthDate,
+                        city = personalDetails.city,
+                        mail = personalDetails.mail,
+                        mobile = personalDetails.mobile,
+                        region = personalDetails.region,
+                        sex = personalDetails.sex,
+                        state = personalDetails.state,
+                        taxCode = personalDetails.taxCode,
+                        zip = personalDetails.zip)
     }
 }
 
