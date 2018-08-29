@@ -34,7 +34,7 @@ class PersonalDetailsRouteTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(PersonalDetailsRepresentation("firstName",
                         "lastName", "address", "zip", "city",
-                        "region", "mail", "mobile", LocalDate.MIN,
+                        "region", "mail", "mobile", LocalDate.now(),
                         "state", Sex.NONE, "taxCode"))).exchange()
                 .expectStatus().isCreated
     }

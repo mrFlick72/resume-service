@@ -1,10 +1,9 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import it.valeriovaudi.resume.resumeservice.domain.model.Sex
-import it.valeriovaudi.resume.resumeservice.adapter.persistance.PersonalDetailsPersistanceModel
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
+import org.bson.Document
 import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -12,20 +11,20 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
-import java.time.Duration
+import java.time.format.DateTimeFormatter
+
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
                                      private val gridFsTemplate: GridFsTemplate) : PersonalDetailsRepository {
 
+    val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
+
     override fun save(resumeId: String, personalDetails: Publisher<PersonalDetails>): Publisher<PersonalDetails> =
 
             personalDetails.toMono().flatMap {
-
                 val personalDetails = it;
                 val savedPersonalDetailsPersistanceModel =
-                        mongoTemplate.save(PersonalDetailsPersistanceModel.fromDomainToPersistanceModel(resumeId, personalDetails))
-                                .timeout(Duration.ofMinutes(1))
-
+                        mongoTemplate.save(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails), "personalDetails")
 
                 val photoData =
                         if (personalDetails.photo.content.isNotEmpty())
@@ -48,21 +47,13 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =
             mongoTemplate.findOne(Query.query(Criteria.where("_id").`is`(resumeId)),
-                    PersonalDetailsPersistanceModel::class.java)
-                    .map {
-                        PersonalDetails(photo = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
-                                zip = it.zip, taxCode = it.taxCode,
-                                state = it.state, sex = Sex.valueOf(it.sex),
-                                region = it.region, mobile = it.mobile,
-                                mail = it.mail, city = it.city,
-                                birthDate = it.birthDate, address = it.address,
-                                lastName = it.lastName, firstName = it.firstName)
-                    }
+                    Document::class.java, "personalDetails")
+                    .map { PersonalDetailsMapper.fromDocumentToDomain(document = it) }
 
 
     override fun findOne(resumeId: String): Publisher<PersonalDetails> =
             Mono.zip(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
-                    PersonalDetailsPersistanceModel::class.java),
+                    Document::class.java, "personalDetails"),
                     Mono.fromCallable { gridFsTemplate.getResource(resumeId) })
                     .map {
                         val personalData = it.t1
@@ -70,13 +61,6 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
                         val photo = PersonalDetailsPhoto(content = resource.inputStream.readAllBytes(),
                                 fileExtension = resource.contentType)
-
-                        PersonalDetails(photo = photo,
-                                zip = personalData.zip, taxCode = personalData.taxCode,
-                                state = personalData.state, sex = Sex.valueOf(personalData.sex),
-                                region = personalData.region, mobile = personalData.mobile,
-                                mail = personalData.mail, city = personalData.city,
-                                birthDate = personalData.birthDate, address = personalData.address,
-                                lastName = personalData.lastName, firstName = personalData.firstName)
+                        PersonalDetailsMapper.fromDocumentToDomain(document = personalData, photo = photo)
                     }
 }

@@ -1,10 +1,10 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import it.valeriovaudi.resume.resumeservice.adapter.persistance.PersonalDetailsPersistanceModel
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto.Companion.emptyPersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.model.Sex
+import org.bson.Document
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert
 import org.junit.Before
@@ -36,6 +36,7 @@ class MongoPersonalDetailsRepositoryTest {
     lateinit var gridFsTemplate: GridFsTemplate
 
     lateinit var mongoPersonalDetailsRepository: MongoPersonalDetailsRepository
+
     @Autowired
     var gridFsOperations: GridFsOperations? = null
 
@@ -62,7 +63,7 @@ class MongoPersonalDetailsRepositoryTest {
 
         println("details")
         Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
-                PersonalDetailsPersistanceModel::class.java)
+                Document::class.java,"personalDetails")
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
@@ -88,7 +89,7 @@ class MongoPersonalDetailsRepositoryTest {
 
                     println("details")
                     Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
-                            PersonalDetailsPersistanceModel::class.java)
+                            Document::class.java,"personalDetails")
                             .block(Duration.ofMinutes(2)))
 
                     println("photo")
