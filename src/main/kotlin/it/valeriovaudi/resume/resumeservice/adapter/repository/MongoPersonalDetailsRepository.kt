@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
 import reactor.core.publisher.onErrorResume
 import reactor.core.publisher.toMono
+import java.util.*
 
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
@@ -21,7 +22,7 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
     override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
         val savedPersonalDetailsPersistanceModel =
                 mongoTemplate.save(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails), "personalDetails")
-                        .onErrorResume { println("Error at ${it}"); Mono.just(Document())}
+                        .onErrorResume { println("Error at ${it}"); Mono.just(Document()) }
 
         val photoData =
                 if (personalDetails.photo.content.isNotEmpty())
@@ -34,10 +35,10 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                                             mutableMapOf("resumeId" to resumeId))
                                 }
                             }
-                else Mono.just("")
+                else Mono.just("");
 
         return Mono.zip(savedPersonalDetailsPersistanceModel, photoData)
-                .map { println("esecuzione dell inserimento"); personalDetails }
+                .map { personalDetails }
                 .onErrorReturn(PersonalDetails.emptyPersonalDetails())
     }
 

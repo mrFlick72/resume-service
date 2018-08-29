@@ -21,8 +21,8 @@ object PersonalDetailsRoute {
                 GET("/resume/{resumeId}/personal-details")
                 {
                     personalDetailsRepository.findOneWithoutPhoto(it.pathVariable("resumeId")).toMono()
-                            .map { PersonalDetailsRepresentation.fromDomainToRepresentation(it) }
-                            .flatMap { ServerResponse.ok().body(it.toMono(), PersonalDetailsRepresentation::class.java) }
+                            .map { PersonalDetailsRepresentation.fromDomainToRepresentation(it).toMono() }
+                            .flatMap { ServerResponse.ok().body(it, PersonalDetailsRepresentation::class.java) }
                 }
 
                 POST("/resume/{resumeId}/personal-details")
