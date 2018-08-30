@@ -24,7 +24,8 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
     }
 
     override fun delete(resumeId: String) =
-            mongoTemplate.remove(findOneQuery(resumeId), collectionName())
+            Mono.zip(mongoTemplate.remove(findOneQuery(resumeId), collectionName()),
+                    Mono.fromCallable { gridFsTemplate.delete(findOneQueryByMetadata(resumeId)) })
                     .flatMap { Mono.just(Unit) }
 
 
