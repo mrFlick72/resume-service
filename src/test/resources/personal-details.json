@@ -1,0 +1,14 @@
+{
+  "firstName": "firstName",
+  "lastName": "lastName",
+  "address": "address",
+  "zip": "zip",
+  "city": "city",
+  "region": "region",
+  "mail": "mail",
+  "mobile": "mobile",
+  "birthDate": "2018-08-30",
+  "state": "state",
+  "sex": "NONE",
+  "taxCode": "taxCode"
+}

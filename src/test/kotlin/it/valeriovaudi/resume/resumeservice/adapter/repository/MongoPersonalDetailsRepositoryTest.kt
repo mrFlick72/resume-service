@@ -1,5 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
+import it.valeriovaudi.resume.resumeservice.TestCase
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto.Companion.emptyPersonalDetailsPhoto
@@ -50,11 +51,7 @@ class MongoPersonalDetailsRepositoryTest {
     fun `save a personal details without photo`() {
 
         val resumeId = UUID.randomUUID().toString()
-
-        val personalDetails = PersonalDetails(emptyPersonalDetailsPhoto(),
-                "Valerio", "Vaudi", "Ennio Ferrari 30 street",
-                "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
-                LocalDate.now(), "Italy", Sex.M, "")
+        val personalDetails = TestCase.personalDetails()
 
         mongoPersonalDetailsRepository.save(resumeId, personalDetails)
                 .toMono().blockOptional().ifPresent {
@@ -73,53 +70,38 @@ class MongoPersonalDetailsRepositoryTest {
     @Test
     fun `save a personal details with photo`() {
         val resumeId = UUID.randomUUID().toString()
-
-        this::class.java.classLoader.getResourceAsStream("barca-a-vela.jpg")
-                .use {
-                    val personalDetails = PersonalDetails(PersonalDetailsPhoto(it.readAllBytes(), "jpg"),
-                            "Valerio", "Vaudi", "Ennio Ferrari 30 street",
-                            "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
-                            LocalDate.now(), "Italy", Sex.M, "")
-
-                    mongoPersonalDetailsRepository.save(resumeId, personalDetails)
-                            .toMono().blockOptional().ifPresent {
-                                Assert.assertThat(it, `is`(personalDetails))
-                            }
-
-
-                    println("details")
-                    Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
-                            Document::class.java,"personalDetails")
-                            .block(Duration.ofMinutes(2)))
-
-                    println("photo")
-                    Assert.assertNotNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
-                    Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
+        val personalDetails = TestCase.personalDetailsWithPhoto()
+        mongoPersonalDetailsRepository.save(resumeId, personalDetails)
+                .toMono().blockOptional().ifPresent {
+                    Assert.assertThat(it, `is`(personalDetails))
                 }
+
+
+        println("details")
+        Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
+                Document::class.java,"personalDetails")
+                .block(Duration.ofMinutes(2)))
+
+        println("photo")
+        Assert.assertNotNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
+        Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
     }
 
     @Test
     fun `find a personal details with photo`() {
         val resumeId = UUID.randomUUID().toString()
+        val personalDetails = TestCase.personalDetailsWithPhoto()
 
-        this::class.java.classLoader.getResourceAsStream("barca-a-vela.jpg")
-                .use {
-                    val personalDetails = PersonalDetails(PersonalDetailsPhoto(it.readAllBytes(), "jpg"),
-                            "Valerio", "Vaudi", "Ennio Ferrari 30 street",
-                            "22100", "Como", "Como", "valerio.vaudi@gmail.com", "",
-                            LocalDate.now(), "Italy", Sex.NONE, "")
-
-                    mongoPersonalDetailsRepository.save(resumeId, personalDetails)
-                            .toMono().blockOptional().ifPresent {
-                                Assert.assertThat(it, `is`(personalDetails))
-                            }
-
-                    val actual = mongoPersonalDetailsRepository.findOne(resumeId)
-                            .toMono().block(Duration.ofMinutes(2))
-
-                    println(actual!!.photo.content.size)
-                    println(actual.photo.fileExtension)
-                    println(actual.firstName)
+        mongoPersonalDetailsRepository.save(resumeId, personalDetails)
+                .toMono().blockOptional().ifPresent {
+                    Assert.assertThat(it, `is`(personalDetails))
                 }
+
+        val actual = mongoPersonalDetailsRepository.findOne(resumeId)
+                .toMono().block(Duration.ofMinutes(2))
+
+        println(actual!!.photo.content.size)
+        println(actual.photo.fileExtension)
+        println(actual.firstName)
     }
 }

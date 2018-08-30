@@ -1,9 +1,8 @@
 package it.valeriovaudi.resume.resumeservice.web.route
 
-import it.valeriovaudi.resume.resumeservice.domain.model.Sex
-import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
+import it.valeriovaudi.resume.resumeservice.TestCase
+import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoPersonalDetailsRepository
 import it.valeriovaudi.todolist.TestContextInitializer
-import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +13,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
-import java.time.LocalDate
+import reactor.core.publisher.toMono
 import java.util.*
 
 @ContextConfiguration(initializers = [TestContextInitializer::class])
@@ -22,8 +21,12 @@ import java.util.*
 @RunWith(SpringRunner::class)
 class PersonalDetailsRouteTest {
 
+
     @Autowired
     private lateinit var webClient: WebTestClient
+
+    @Autowired
+    private lateinit var personalDetailsRepository: MongoPersonalDetailsRepository
 
     @Test
     @WithMockUser(username = "user")
@@ -32,10 +35,23 @@ class PersonalDetailsRouteTest {
         webClient.post()
                 .uri("/resume/${resumeId}/personal-details")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(PersonalDetailsRepresentation("firstName",
-                        "lastName", "address", "zip", "city",
-                        "region", "mail", "mobile", LocalDate.now(),
-                        "state", Sex.NONE, "taxCode"))).exchange()
+                .body(BodyInserters.fromObject(TestCase.personalDetails())).exchange()
                 .expectStatus().isCreated
     }
+
+    @Test
+    @WithMockUser(username = "user")
+    fun `read basic personal details data`() {
+        personalDetailsRepository.save("RESUME_ID", TestCase.personalDetails()).toMono().block();
+
+        val expectedJson = TestCase.readFileAsString("personal-details.json")
+        val resumeId = UUID.randomUUID().toString();
+        webClient.get()
+                .uri("/resume/RESUME_ID/personal-details")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk
+                .expectBody().json(expectedJson)
+    }
+
 }

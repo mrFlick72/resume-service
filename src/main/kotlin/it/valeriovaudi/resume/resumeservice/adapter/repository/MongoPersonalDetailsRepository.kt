@@ -1,5 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
+import com.mongodb.client.result.UpdateResult
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
@@ -8,11 +9,9 @@ import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
-import reactor.core.publisher.onErrorResume
-import reactor.core.publisher.toMono
-import java.util.*
 
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
@@ -20,9 +19,10 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
 
     override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
-        val savedPersonalDetailsPersistanceModel =
-                mongoTemplate.save(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails), "personalDetails")
-                        .onErrorResume { println("Error at ${it}"); Mono.just(Document()) }
+        val personalDetailsMono =
+                mongoTemplate.upsert(Query.query(Criteria.where("resumeId").`is`(resumeId)),
+                        Update.fromDocument(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails)), "personalDetails")
+                        .onErrorResume { println("Error at ${it}"); Mono.just(UpdateResult.unacknowledged()) }
 
         val photoData =
                 if (personalDetails.photo.content.isNotEmpty())
@@ -37,7 +37,7 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                             }
                 else Mono.just("");
 
-        return Mono.zip(savedPersonalDetailsPersistanceModel, photoData)
+        return Mono.zip(personalDetailsMono, photoData)
                 .map { personalDetails }
                 .onErrorReturn(PersonalDetails.emptyPersonalDetails())
     }

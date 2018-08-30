@@ -2,12 +2,10 @@ package it.valeriovaudi.resume.resumeservice.web.route
 
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
 import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
-import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation.Companion.fromDomainToRepresentation
 import org.springframework.context.support.beans
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
-import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 
 object PersonalDetailsRoute {
