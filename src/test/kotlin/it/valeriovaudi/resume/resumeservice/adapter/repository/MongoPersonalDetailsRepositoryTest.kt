@@ -100,8 +100,40 @@ class MongoPersonalDetailsRepositoryTest {
         val actual = mongoPersonalDetailsRepository.findOne(resumeId)
                 .toMono().block(Duration.ofMinutes(2))
 
+        Assert.assertNotNull(actual)
         println(actual!!.photo.content.size)
         println(actual.photo.fileExtension)
         println(actual.firstName)
+    }
+
+    @Test
+    fun `delete an existing personal details`() {
+
+        val resumeId = UUID.randomUUID().toString()
+        val personalDetails = TestCase.personalDetailsWithPhoto()
+
+        mongoPersonalDetailsRepository.save(resumeId, personalDetails)
+                .toMono().blockOptional().ifPresent {
+                    Assert.assertThat(it, `is`(personalDetails))
+                }
+
+        val actual = mongoPersonalDetailsRepository.findOne(resumeId)
+                .toMono().block(Duration.ofMinutes(2))
+
+        println(actual!!.photo.content.size)
+        println(actual.photo.fileExtension)
+        println(actual.firstName)
+
+        mongoPersonalDetailsRepository.delete(resumeId).toMono().block(Duration.ofMinutes(1))
+
+        println("details")
+        Assert.assertNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
+                Document::class.java,"personalDetails")
+                .block(Duration.ofMinutes(2)))
+
+        println("photo")
+        Assert.assertNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
+        Assert.assertNull(gridFsTemplate.getResource(resumeId))
+
     }
 }

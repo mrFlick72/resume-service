@@ -17,16 +17,26 @@ import reactor.core.publisher.Mono
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
                                      private val gridFsTemplate: GridFsTemplate) : PersonalDetailsRepository {
 
+    companion object {
+        fun collectionName() = "personalDetails"
+        fun findOneQuery(resumeId: String) = Query.query(Criteria.where("resumeId").`is`(resumeId))
+        fun findOneQueryByMetadata(resumeId: String) = Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))
+    }
+
+    override fun delete(resumeId: String) =
+            mongoTemplate.remove(findOneQuery(resumeId), collectionName())
+                    .flatMap { Mono.just(Unit) }
+
 
     override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
         val personalDetailsMono =
-                mongoTemplate.upsert(Query.query(Criteria.where("resumeId").`is`(resumeId)),
-                        Update.fromDocument(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails)), "personalDetails")
+                mongoTemplate.upsert(findOneQuery(resumeId),
+                        Update.fromDocument(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails)), collectionName())
                         .onErrorResume { println("Error at ${it}"); Mono.just(UpdateResult.unacknowledged()) }
 
         val photoData =
                 if (personalDetails.photo.content.isNotEmpty())
-                    Mono.fromCallable { gridFsTemplate.delete(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))) }
+                    Mono.fromCallable { gridFsTemplate.delete(findOneQueryByMetadata(resumeId)) }
                             .map {
                                 personalDetails.photo.content.inputStream().use {
                                     gridFsTemplate.store(it,
@@ -44,14 +54,12 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =
-            mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
-                    Document::class.java, "personalDetails")
+            mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName())
                     .map { PersonalDetailsMapper.fromDocumentToDomain(document = it) }
 
 
     override fun findOne(resumeId: String): Publisher<PersonalDetails> =
-            Mono.zip(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
-                    Document::class.java, "personalDetails"),
+            Mono.zip(mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName()),
                     Mono.fromCallable { gridFsTemplate.getResource(resumeId) })
                     .map {
                         val personalData = it.t1

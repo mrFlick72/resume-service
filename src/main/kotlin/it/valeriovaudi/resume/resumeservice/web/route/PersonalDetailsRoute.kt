@@ -32,6 +32,17 @@ object PersonalDetailsRoute {
                             .flatMap { ServerResponse.status(HttpStatus.CREATED).build() }
                 }
 
+                PUT("/resume/{resumeId}/personal-details")
+                {
+                    val resumeId = it.pathVariable("resumeId")
+                    it.bodyToMono(PersonalDetailsRepresentation::class.java)
+                            .map { PersonalDetailsRepresentation.fromRepresentationToDomain(it) }
+                            .flatMap { personalDetailsRepository.save(resumeId, it).toMono() }
+                            .flatMap { ServerResponse.status(HttpStatus.NO_CONTENT).build() }
+                }
+
+
+
 
             }
         }

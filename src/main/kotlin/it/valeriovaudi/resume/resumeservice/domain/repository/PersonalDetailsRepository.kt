@@ -11,4 +11,6 @@ interface PersonalDetailsRepository {
 
     fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails>
 
+    fun delete(resumeId: String): Publisher<Unit>
+
 }
