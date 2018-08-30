@@ -41,7 +41,13 @@ object PersonalDetailsRoute {
                             .flatMap { ServerResponse.status(HttpStatus.NO_CONTENT).build() }
                 }
 
+                DELETE("/resume/{resumeId}/personal-details")
+                {
+                    val resumeId = it.pathVariable("resumeId")
+                    personalDetailsRepository.delete(resumeId).toMono()
+                            .flatMap { ServerResponse.status(HttpStatus.NO_CONTENT).build() }
 
+                }
 
 
             }

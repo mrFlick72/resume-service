@@ -3,6 +3,7 @@ package it.valeriovaudi.resume.resumeservice.web.route
 import it.valeriovaudi.resume.resumeservice.TestCase
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoPersonalDetailsRepository
 import it.valeriovaudi.todolist.TestContextInitializer
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,13 +46,27 @@ class PersonalDetailsRouteTest {
         personalDetailsRepository.save("RESUME_ID", TestCase.personalDetails()).toMono().block();
 
         val expectedJson = TestCase.readFileAsString("personal-details.json")
-        val resumeId = UUID.randomUUID().toString();
         webClient.get()
                 .uri("/resume/RESUME_ID/personal-details")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk
                 .expectBody().json(expectedJson)
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    fun `delete basic personal details data`() {
+        personalDetailsRepository.save("RESUME_ID", TestCase.personalDetails()).toMono().block();
+
+        webClient.delete()
+                .uri("/resume/RESUME_ID/personal-details")
+                .exchange()
+                .expectStatus().isNoContent
+
+
+        Assert.assertNull(personalDetailsRepository.findOne("RESUME_ID").toMono().block())
+
     }
 
 }
