@@ -32,12 +32,15 @@ class PersonalDetailsRouteTest {
     @Test
     @WithMockUser(username = "user")
     fun `save basic personal details data`() {
+        val expectedJson = TestCase.readFileAsString("personal-details.json")
         val resumeId = UUID.randomUUID().toString();
-        webClient.post()
+        webClient.put()
                 .uri("/resume/${resumeId}/personal-details")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(TestCase.personalDetails())).exchange()
-                .expectStatus().isCreated
+                .body(BodyInserters.fromObject(TestCase.personalDetails()))
+                .exchange()
+                .expectStatus().isOk
+                .expectBody().json(expectedJson)
     }
 
     @Test

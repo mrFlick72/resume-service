@@ -46,7 +46,6 @@ class MongoPersonalDetailsRepositoryTest {
         mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)
     }
 
-
     @Test
     fun `save a personal details without photo`() {
 
