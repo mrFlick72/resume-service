@@ -2,19 +2,19 @@ package it.valeriovaudi.resume.resumeservice.web.route
 
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
 import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
-import org.springframework.context.support.beans
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.toMono
 
-object PersonalDetailsRoute {
+@Configuration
+class PersonalDetailsRoute {
 
-    fun routes() = beans {
-        bean {
-            val personalDetailsRepository = ref<PersonalDetailsRepository>()
-
+    @Bean
+    fun personalDetailsRoutes(personalDetailsRepository : PersonalDetailsRepository) =
             router {
 
                 GET("/resume/{resumeId}/personal-details")
@@ -40,6 +40,5 @@ object PersonalDetailsRoute {
                             .flatMap { ServerResponse.status(HttpStatus.NO_CONTENT).build() }
                 }
             }
-        }
-    }
+
 }

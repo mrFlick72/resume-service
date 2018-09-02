@@ -2,6 +2,7 @@ package it.valeriovaudi.resume.resumeservice
 
 import it.valeriovaudi.resume.resumeservice.web.config.RepositoryConfig
 import it.valeriovaudi.resume.resumeservice.web.route.PersonalDetailsRoute
+import it.valeriovaudi.resume.resumeservice.web.route.ResumeRoute
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -11,7 +12,6 @@ class ResumeServiceApplication
 fun main(args: Array<String>) {
     runApplication<ResumeServiceApplication>(*args) {
         addInitializers(RepositoryConfig.beans())
-        addInitializers(PersonalDetailsRoute.routes())
     }
 }
 
