@@ -6,3 +6,5 @@ spring:
       database: resume
 
 management.endpoints.web.exposure.include: "*"
+
+baseServer: http://localhost:8080
