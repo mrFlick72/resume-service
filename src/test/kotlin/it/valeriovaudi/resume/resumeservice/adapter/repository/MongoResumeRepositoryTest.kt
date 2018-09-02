@@ -46,4 +46,16 @@ class MongoResumeRepositoryTest {
 
         Assert.assertNotNull(actualResumeDocument)
     }
+
+    @Test
+    fun `find a resume by id`() {
+        val resumeId = UUID.randomUUID().toString()
+        val emptyResume = Resume.emptyResume(resumeId, "A_USER", Language.EN)
+
+        val actualResume = mongoResumeRepository.save(emptyResume).toMono()
+                .then(mongoResumeRepository.findOne(resumeId).toMono())
+                .block(Duration.ofMinutes(1))
+
+        Assert.assertNotNull(actualResume)
+    }
 }

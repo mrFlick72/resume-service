@@ -4,6 +4,7 @@ import com.mongodb.client.result.UpdateResult
 import it.valeriovaudi.resume.resumeservice.domain.model.Language
 import it.valeriovaudi.resume.resumeservice.domain.model.Resume
 import it.valeriovaudi.resume.resumeservice.domain.repository.ResumeRepository
+import org.bson.Document
 import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -19,9 +20,9 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate) : 
     }
 
 
-    override fun findOne(resumeId: String): Publisher<Resume> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun findOne(resumeId: String): Publisher<Resume> =
+            mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName())
+                    .map { ResumeMapper.fromDocumentToDomain(it) }
 
     override fun findOneByUserName(userName: String, language: Language): Publisher<Resume> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
