@@ -1,8 +1,15 @@
 package it.valeriovaudi.resume.resumeservice.web.route
 
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoPersonalDetailsRepository
+import com.fasterxml.jackson.databind.ObjectMapper
+import it.valeriovaudi.resume.resumeservice.domain.model.Language
+import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
+import it.valeriovaudi.resume.resumeservice.domain.model.Resume
+import it.valeriovaudi.resume.resumeservice.domain.model.Skill
+import it.valeriovaudi.resume.resumeservice.domain.repository.ResumeRepository
+import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
+import it.valeriovaudi.resume.resumeservice.web.representation.ResumeRepresentation
 import it.valeriovaudi.todolist.TestContextInitializer
-import junit.framework.Assert.assertNull
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +20,8 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import reactor.core.publisher.toMono
+import java.time.Duration
+import java.util.*
 
 @ContextConfiguration(initializers = [TestContextInitializer::class])
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,21 +32,40 @@ class ResumeRouteTest {
     private lateinit var webClient: WebTestClient
 
     @Autowired
-    private lateinit var personalDetailsRepository: MongoPersonalDetailsRepository
+    private lateinit var resumeRepository: ResumeRepository
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
 
     @Test
     @WithMockUser(username = "user")
-    fun `save basic personal details data`() {
+    fun `save reume`() {
         val location = webClient.post()
                 .uri("/resume")
                 .exchange()
                 .expectStatus().isCreated
                 .returnResult<Any>().responseHeaders.location
 
-        val locationChunck = location!!.toString().split("\\/")
+        val locationChunck = location!!.toString().split("/")
         val resumeId = locationChunck[locationChunck.size - 1];
+        Assert.assertNotNull(resumeRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1)))
+    }
 
-        assertNull(personalDetailsRepository.findOne(resumeId).toMono().block())
+    @Test
+    @WithMockUser(username = "user")
+    fun `find resume`() {
+        val resumeId = UUID.randomUUID().toString()
+        val resume = Resume(resumeId, "USER_NAME", Language.EN, PersonalDetails.emptyPersonalDetails(), listOf(Skill("FAMILY", listOf("SKILL_1"))))
+        val resumeRepresentation = ResumeRepresentation(resumeId, "USER_NAME", Language.EN.name, PersonalDetailsRepresentation.fromDomainToRepresentation(PersonalDetails.emptyPersonalDetails()), listOf(Skill("FAMILY", listOf("SKILL_1"))))
+
+        resumeRepository.save(resume).toMono().block(Duration.ofMinutes(1))
+
+        webClient.get()
+                .uri("/resume/${resume.id}")
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .json(objectMapper.writeValueAsString(resumeRepresentation))
     }
 
 }

@@ -19,7 +19,6 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                                          var taxCode: String? = "") {
     companion object {
         fun fromRepresentationToDomain(personalDetails: PersonalDetailsRepresentation): PersonalDetails  {
-            println(personalDetails)
             return PersonalDetails(photo = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
                     firstName = personalDetails.firstName!!,
                     lastName = personalDetails.lastName!!,
