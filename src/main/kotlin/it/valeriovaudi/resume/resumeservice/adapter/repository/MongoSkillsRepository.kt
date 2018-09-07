@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update.fromDocument
+import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 
 class MongoSkillsRepository(private val mongoTemplate: ReactiveMongoTemplate) : SkillsRepository {
@@ -28,9 +29,7 @@ class MongoSkillsRepository(private val mongoTemplate: ReactiveMongoTemplate) : 
                         .map { skill }
             }
 
-
-    override fun delete(resumeId: String, skillFamily: String): Publisher<Unit> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun delete(resumeId: String, skillFamily: String): Publisher<Unit> =
+            mongoTemplate.remove(findOneQuery(resumeId, skillFamily), collectionName()).flatMap { Mono.just(Unit) }
 
 }

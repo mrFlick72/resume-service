@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.test.context.junit4.SpringRunner
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
@@ -60,6 +59,26 @@ class MongoSkillsRepositoryTest {
         Assert.assertNotNull(allSkills)
         Assert.assertThat(allSkills, Is.`is`(listOf(Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")),
                 Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))))
+    }
 
+    @Test
+    fun `delete a specific skill family of a resume`() {
+        val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
+
+        val resumeId = UUID.randomUUID().toString()
+        mongoSkillsRepository.save(resumeId, Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))
+                .toMono()
+                .block(Duration.ofMinutes(1))
+
+        mongoSkillsRepository.save(resumeId, Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))
+                .toMono()
+                .block(Duration.ofMinutes(1))
+
+        mongoSkillsRepository.delete(resumeId, "A_FAMILY").toMono().block(Duration.ofMinutes(1))
+        val allSkills = mongoSkillsRepository.findOne(resumeId).toFlux().collectList()
+                .block(Duration.ofMinutes(1))
+
+        Assert.assertNotNull(allSkills)
+        Assert.assertThat(allSkills, Is.`is`(listOf(Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))))
     }
 }
