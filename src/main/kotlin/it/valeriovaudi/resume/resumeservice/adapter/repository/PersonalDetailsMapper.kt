@@ -1,6 +1,5 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import com.mongodb.BasicDBObjectBuilder
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.model.Sex
