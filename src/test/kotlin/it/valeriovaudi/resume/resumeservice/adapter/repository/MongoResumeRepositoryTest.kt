@@ -4,6 +4,7 @@ import it.valeriovaudi.resume.resumeservice.TestCase
 import it.valeriovaudi.resume.resumeservice.domain.model.Language
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.Resume
+import it.valeriovaudi.resume.resumeservice.domain.repository.SkillsRepository
 import org.assertj.core.api.Assertions
 import org.bson.Document
 import org.hamcrest.core.Is
@@ -36,16 +37,19 @@ class MongoResumeRepositoryTest {
 
     lateinit var mongoPersonalDetailsRepository: MongoPersonalDetailsRepository
 
+    lateinit var mongoSkillsRepository: MongoSkillsRepository
+
     @Before
     fun setUp() {
+        mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
         mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)
-        mongoResumeRepository = MongoResumeRepository(mongoTemplate, mongoPersonalDetailsRepository)
+        mongoResumeRepository = MongoResumeRepository(mongoTemplate, mongoPersonalDetailsRepository, mongoSkillsRepository)
     }
 
     @Test
     fun `save a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
 
         mongoResumeRepository.save(emptyResume).toMono().block(Duration.ofMinutes(1))
 
@@ -68,7 +72,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find a resume by id`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
 
         val actualResume = mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.findOne(resumeId).toMono())
@@ -81,7 +85,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find a resume by user name`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
 
         val actualResume = mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.findOneByUserName("A_USER", Language.EN).toMono())
@@ -94,7 +98,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `delete a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
 
         mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.delete(resumeId).toMono())

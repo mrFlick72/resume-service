@@ -15,7 +15,7 @@ import reactor.core.publisher.toMono
 class SkillRoute {
 
     @Bean
-    fun resumeRoutes(skillsRepository: SkillsRepository) = router {
+    fun skillRoutes(skillsRepository: SkillsRepository) = router {
         GET("/resume/{resumeId}/skill")
         {
             val resumeId = it.pathVariable("resumeId")
@@ -26,7 +26,7 @@ class SkillRoute {
         {
             val resumeId = it.pathVariable("resumeId")
             it.bodyToMono(Skill::class.java)
-                    .flatMap { skillsRepository.save(resumeId, it).toMono() }
+                    .flatMap { skillsRepository.save(resumeId, listOf(it)).toMono() }
                     .flatMap { ServerResponse.noContent().build() }
         }
         DELETE("/resume/{resumeId}/skill/{skillFamily}")

@@ -31,7 +31,7 @@ class MongoSkillsRepositoryTest {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
         val resumeId = UUID.randomUUID().toString()
-        val save = mongoSkillsRepository.save(resumeId, Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))
+        val save = mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3"))))
                 .toMono()
                 .block(Duration.ofMinutes(1))
 
@@ -45,11 +45,11 @@ class MongoSkillsRepositoryTest {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
         val resumeId = UUID.randomUUID().toString()
-        mongoSkillsRepository.save(resumeId, Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))
+        mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3"))))
                 .toMono()
                 .block(Duration.ofMinutes(1))
 
-        mongoSkillsRepository.save(resumeId, Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))
+        mongoSkillsRepository.save(resumeId, listOf(Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3"))))
                 .toMono()
                 .block(Duration.ofMinutes(1))
 
@@ -66,11 +66,11 @@ class MongoSkillsRepositoryTest {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
         val resumeId = UUID.randomUUID().toString()
-        mongoSkillsRepository.save(resumeId, Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))
+        mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3"))))
                 .toMono()
                 .block(Duration.ofMinutes(1))
 
-        mongoSkillsRepository.save(resumeId, Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")))
+        mongoSkillsRepository.save(resumeId, listOf(Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3"))))
                 .toMono()
                 .block(Duration.ofMinutes(1))
 

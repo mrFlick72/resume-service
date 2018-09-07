@@ -23,7 +23,7 @@ class MongoSkillsRepository(private val mongoTemplate: ReactiveMongoTemplate) : 
             mongoTemplate.find(findOneQuery(resumeId = resumeId), Document::class.java, collectionName())
                     .map { SkillMapper.fromDocumentToDomain(it) }
 
-    override fun save(resumeId: String, vararg skills: Skill): Publisher<Skill> =
+    override fun save(resumeId: String, skills: List<Skill>): Publisher<Skill> =
             skills.toFlux().flatMap { skill ->
                 mongoTemplate.upsert(findOneQuery(resumeId = resumeId, skillFamily = skill.family), fromDocument(SkillMapper.fromDomainToDocument(resumeId, skill)), collectionName())
                         .map { skill }

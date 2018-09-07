@@ -53,7 +53,7 @@ class SkillsRouteTest {
 
         val resumeId = UUID.randomUUID().toString()
         val skill = Skill("FAMILY", listOf("SKILL_1", "SKILL_2"))
-        skillsRepository.save(resumeId, skill).toMono().block()
+        skillsRepository.save(resumeId, listOf(skill)).toMono().block()
 
         webClient.get()
                 .uri("/resume/${resumeId}/skill")
@@ -67,7 +67,7 @@ class SkillsRouteTest {
     @WithMockUser(username = "user")
     fun `delete a skill family of a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        skillsRepository.save(resumeId, Skill("FAMILY", listOf("SKILL_1", "SKILL_2"))).toMono().block()
+        skillsRepository.save(resumeId, listOf(Skill("FAMILY", listOf("SKILL_1", "SKILL_2")))).toMono().block()
 
         webClient.delete()
                 .uri("/resume/${resumeId}/skill/FAMILY")

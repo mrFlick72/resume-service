@@ -17,6 +17,7 @@ object ResumeMapper {
         Resume(id = document.getString("_id"),
                 userName = document.getString("userName"),
                 language = Language.valueOf(document.getString("language")),
-                personalDetails = PersonalDetails.emptyPersonalDetails())
+                personalDetails = PersonalDetails.emptyPersonalDetails(),
+                skill = listOf())
 
 }
