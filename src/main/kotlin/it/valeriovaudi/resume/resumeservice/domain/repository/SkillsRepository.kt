@@ -9,6 +9,8 @@ interface SkillsRepository {
 
     fun findOne(resumeId: String, skillFamily : String): Publisher<Skill>
 
-    fun save(resumeId: String, skill: Publisher<Skill>): Publisher<Skill>
+    fun save(resumeId: String, skill: Skill): Publisher<Skill>
+
+    fun delete(resumeId: String, skillFamily: String): Publisher<Unit>
 
 }
