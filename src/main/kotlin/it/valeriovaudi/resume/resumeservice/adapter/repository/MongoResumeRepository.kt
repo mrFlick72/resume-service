@@ -12,11 +12,9 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
-import java.time.Duration
 
 class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
                             private val personalDetailsRepository: MongoPersonalDetailsRepository,
@@ -52,7 +50,7 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
 
     private fun saveOtherResumeData(resume: Resume) = resume.let {
         Mono.zip(personalDetailsRepository.save(resumeId = it.id, personalDetails = it.personalDetails).toMono(),
-                if(it.skill.size != 0) skillsRepository.save(it.id, it.skill).toFlux().collectList() else Mono.just(listOf<Skill>()))
+                if(it.skill.isNotEmpty()) skillsRepository.save(it.id, it.skill).toFlux().collectList() else Mono.just(listOf<Skill>()))
         { t, u -> resume }
     }
 
