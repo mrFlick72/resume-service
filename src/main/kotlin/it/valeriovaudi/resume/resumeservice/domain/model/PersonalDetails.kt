@@ -11,14 +11,14 @@ data class PersonalDetails(val photo: PersonalDetailsPhoto,
                            val region: String,
                            val mail: String,
                            val mobile: String,
-                           val birthDate: LocalDate,
+                           val birthDate: LocalDate? = null,
                            val state: String,
                            val sex: Sex,
                            val taxCode: String) {
     companion object {
         fun emptyPersonalDetails() = PersonalDetails(photo = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
                 firstName = "", lastName = "", address = "", zip = "", city = "", region = "", mail = "",
-                mobile = "", birthDate = LocalDate.MIN, state = "", sex = Sex.NONE, taxCode = "")
+                mobile = "", birthDate = null, state = "", sex = Sex.NONE, taxCode = "")
     }
 }
 

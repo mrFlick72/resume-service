@@ -1,10 +1,10 @@
 package it.valeriovaudi.resume.resumeservice
 
 import it.valeriovaudi.resume.resumeservice.web.config.RepositoryConfig
-import it.valeriovaudi.resume.resumeservice.web.route.PersonalDetailsRoute
-import it.valeriovaudi.resume.resumeservice.web.route.ResumeRoute
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @SpringBootApplication
 class ResumeServiceApplication
@@ -14,4 +14,3 @@ fun main(args: Array<String>) {
         addInitializers(RepositoryConfig.beans())
     }
 }
-
