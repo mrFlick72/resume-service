@@ -20,6 +20,10 @@ data class PersonalDetails(val photo: PersonalDetailsPhoto,
                 firstName = "", lastName = "", address = "", zip = "", city = "", region = "", mail = "",
                 mobile = "", birthDate = null, state = "", sex = Sex.NONE, taxCode = "")
     }
+
+    fun isEmpty() = this.photo.isEmpty() && firstName.isEmpty() && lastName.isEmpty() && address.isEmpty()
+            && zip.isEmpty() && city.isEmpty() && region.isEmpty() && mail.isEmpty() && mobile.isEmpty()
+            && birthDate == null && state.isEmpty() && sex == Sex.NONE && taxCode.isEmpty()
 }
 
 

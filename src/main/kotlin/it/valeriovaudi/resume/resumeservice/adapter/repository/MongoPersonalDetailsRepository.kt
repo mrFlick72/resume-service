@@ -1,17 +1,21 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
+import com.mongodb.client.gridfs.model.GridFSFile
 import com.mongodb.client.result.UpdateResult
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
+import org.bson.BsonString
 import org.bson.Document
 import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.mongodb.gridfs.GridFsResource
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
+import java.util.*
 
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
@@ -56,12 +60,15 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =
             mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName())
+                    .switchIfEmpty(Mono.just(Document(mutableMapOf())))
                     .map { PersonalDetailsMapper.fromDocumentToDomain(document = it) }
 
 
     override fun findOne(resumeId: String): Publisher<PersonalDetails> =
-            Mono.zip(mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName()),
-                    Mono.fromCallable { gridFsTemplate.getResource(resumeId) })
+            Mono.zip(mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName())
+                    .switchIfEmpty(Mono.just(Document(mutableMapOf()))),
+                    Mono.fromCallable { gridFsTemplate.getResource(resumeId) }
+                            .switchIfEmpty(Mono.just(GridFsResource(GridFSFile(BsonString(UUID.randomUUID().toString()), "", 0, 0, Date(), "", Document(), Document(mapOf("contentType" to PersonalDetailsPhoto.emptyPersonalDetailsPhoto().fileExtension)))))))
                     .map {
                         val personalData = it.t1
                         val resource = it.t2

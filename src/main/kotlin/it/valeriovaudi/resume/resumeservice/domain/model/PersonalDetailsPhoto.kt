@@ -8,6 +8,9 @@ data class PersonalDetailsPhoto(val content: ByteArray,
     companion object {
         fun emptyPersonalDetailsPhoto() = PersonalDetailsPhoto(ByteArray(0), "jpeg")
     }
+
+    fun isEmpty() = this.content.isEmpty();
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

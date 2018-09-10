@@ -59,7 +59,7 @@ class MongoPersonalDetailsRepositoryTest {
 
         println("details")
         Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
-                Document::class.java,"personalDetails")
+                Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
@@ -78,7 +78,7 @@ class MongoPersonalDetailsRepositoryTest {
 
         println("details")
         Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
-                Document::class.java,"personalDetails")
+                Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
@@ -106,6 +106,28 @@ class MongoPersonalDetailsRepositoryTest {
     }
 
     @Test
+    fun `find a personal details whitout  photo not in db`() {
+        val resumeId = UUID.randomUUID().toString()
+
+        val actual = mongoPersonalDetailsRepository.findOneWithoutPhoto(resumeId)
+                .toMono().block(Duration.ofMinutes(2))
+
+        Assert.assertNotNull(actual)
+        Assert.assertTrue(actual!!.isEmpty())
+    }
+
+    @Test
+    fun `find a personal details not in db`() {
+        val resumeId = UUID.randomUUID().toString()
+
+        val actual = mongoPersonalDetailsRepository.findOne(resumeId)
+                .toMono().block(Duration.ofMinutes(2))
+
+        Assert.assertNotNull(actual)
+        Assert.assertTrue(actual!!.isEmpty())
+    }
+
+    @Test
     fun `delete an existing personal details`() {
 
         val resumeId = UUID.randomUUID().toString()
@@ -127,7 +149,7 @@ class MongoPersonalDetailsRepositoryTest {
 
         println("details")
         Assert.assertNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
-                Document::class.java,"personalDetails")
+                Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
 
         println("photo")

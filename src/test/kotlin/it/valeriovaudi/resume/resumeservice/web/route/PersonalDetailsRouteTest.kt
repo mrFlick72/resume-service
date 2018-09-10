@@ -68,8 +68,6 @@ class PersonalDetailsRouteTest {
                 .expectStatus().isNoContent
 
 
-        Assert.assertNull(personalDetailsRepository.findOne("RESUME_ID").toMono().block())
-
+        Assert.assertTrue(personalDetailsRepository.findOne("RESUME_ID").toMono().block()!!.isEmpty())
     }
-
 }

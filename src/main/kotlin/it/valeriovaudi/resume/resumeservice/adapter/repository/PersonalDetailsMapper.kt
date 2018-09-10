@@ -3,6 +3,7 @@ package it.valeriovaudi.resume.resumeservice.adapter.repository
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.model.Sex
+import it.valeriovaudi.resume.resumeservice.getStringOrDefault
 import org.bson.Document
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -31,19 +32,23 @@ object PersonalDetailsMapper {
     fun fromDocumentToDomain(photo: PersonalDetailsPhoto = PersonalDetailsPhoto.emptyPersonalDetailsPhoto(),
                              document: Document) =
             PersonalDetails(photo = photo,
-                    zip = document.getString("zip"),
-                    taxCode = document.getString("taxCode"),
-                    state = document.getString("state"),
-                    sex = Sex.valueOf(document.getString("sex")),
-                    region = document.getString("region"),
-                    mobile = document.getString("mobile"),
-                    mail = document.getString("mail"),
-                    city = document.getString("city"),
-                    birthDate = formatOrNull(dateFormatter, document.getString("birthDate")),
-                    address = document.getString("address"),
-                    lastName = document.getString("lastName"),
-                    firstName = document.getString("firstName"))
+                    zip = document.getStringOrDefault("zip"),
+                    taxCode = document.getStringOrDefault("taxCode"),
+                    state = document.getStringOrDefault("state"),
+                    sex = Sex.valueOf(document.getStringOrDefault("sex", Sex.NONE.name)),
+                    region = document.getStringOrDefault("region"),
+                    mobile = document.getStringOrDefault("mobile"),
+                    mail = document.getStringOrDefault("mail"),
+                    city = document.getStringOrDefault("city"),
+                    birthDate = formatOrNull(dateFormatter, document.getStringOrDefault("birthDate")),
+                    address = document.getStringOrDefault("address"),
+                    lastName = document.getStringOrDefault("lastName"),
+                    firstName = document.getStringOrDefault("firstName"))
 
     private fun formatOrNull(dateFormatter: DateTimeFormatter, dateAsString: String): LocalDate? =
-            try { LocalDate.from(dateFormatter.parse(dateAsString)) } catch (e: Exception) { null }
+            try {
+                LocalDate.from(dateFormatter.parse(dateAsString))
+            } catch (e: Exception) {
+                null
+            }
 }
