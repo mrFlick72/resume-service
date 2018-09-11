@@ -41,6 +41,18 @@ class MongoSkillsRepositoryTest {
     }
 
     @Test
+    fun `find all skills of a not exist resume`() {
+        val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
+
+        val resumeId = UUID.randomUUID().toString()
+
+        val allSkills = mongoSkillsRepository.findOne(resumeId).toFlux().collectList()
+                .block(Duration.ofMinutes(1))
+
+        Assert.assertTrue(allSkills!!.isEmpty())
+    }
+
+    @Test
     fun `find all skills of a resume`() {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
