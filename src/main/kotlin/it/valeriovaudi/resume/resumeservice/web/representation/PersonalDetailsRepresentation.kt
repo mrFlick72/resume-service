@@ -14,7 +14,7 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                                          var mail: String? = "",
                                          var mobile: String? = "",
                                          var birthDate: LocalDate? = null,
-                                         var state: String? = "",
+                                         var country: String? = "",
                                          var sex: Sex? = Sex.NONE,
                                          var taxCode: String? = "") {
     companion object {
@@ -29,7 +29,7 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                     mobile = personalDetails.mobile!!,
                     region = personalDetails.region!!,
                     sex = personalDetails.sex!!,
-                    state = personalDetails.state!!,
+                    country = personalDetails.country!!,
                     taxCode = personalDetails.taxCode!!,
                     zip = personalDetails.zip!!)
 
@@ -46,7 +46,7 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                         mobile = personalDetails.mobile,
                         region = personalDetails.region,
                         sex = personalDetails.sex,
-                        state = personalDetails.state,
+                        country = personalDetails.country,
                         taxCode = personalDetails.taxCode,
                         zip = personalDetails.zip)
     }

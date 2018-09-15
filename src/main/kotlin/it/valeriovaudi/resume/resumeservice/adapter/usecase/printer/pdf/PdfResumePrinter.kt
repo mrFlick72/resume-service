@@ -9,19 +9,41 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
-import com.itextpdf.layout.element.*
+import com.itextpdf.layout.element.Cell
+import com.itextpdf.layout.element.Image
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Table
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeRepository
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
+import it.valeriovaudi.resume.resumeservice.domain.model.Sex
 import it.valeriovaudi.resume.resumeservice.domain.usecase.ResumePrinter
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
+import java.beans.Introspector
 import java.io.FileInputStream
 import java.io.InputStream
 import java.nio.file.Files
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : ResumePrinter {
     val ROW_COLOR: Color = DeviceRgb(253, 253, 248)
+
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+    val resumeDefaultLabel = mapOf("firstName" to "First Name",
+            "lastName" to "Last Name",
+            "address" to "Address",
+            "zip" to "Zip",
+            "city" to "City",
+            "region" to "Region",
+            "mail" to "Mail",
+            "mobile" to "Mobile",
+            "birthDate" to "Birth Date",
+            "country" to "Country",
+            "sex" to "Sex",
+            "taxCode" to "Tax Code")
 
     override fun printResumeFor(resumeId: String): InputStream {
         val pdfPath = Files.createTempFile(UUID.randomUUID().toString(), ".pdf")
@@ -59,9 +81,19 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
     fun newPersonalDetailsCells(table: Table, personalDetails: PersonalDetails) {
         table.addCell(newFirstCell("Resume")).addCell(photoCell(personalDetails.photo.content))
         table.addCell(newFirstCell("Personal Details")).addCell(newSecondCell(""))
-        table.addCell(newFirstCell("First Name")).addCell(newSecondCell(personalDetails.firstName))
-        table.addCell(newFirstCell("Last Name")).addCell(newSecondCell(personalDetails.lastName))
 
+        Introspector.getBeanInfo(personalDetails::class.java).propertyDescriptors.map {
+            val data = it.readMethod.invoke(personalDetails)
+            val label = resumeDefaultLabel.getOrDefault(it.name, "")
+
+            when (data) {
+                is String -> table.addCell(newFirstCell(label)).addCell(newSecondCell(data))
+                is LocalDate -> table.addCell(newFirstCell(label)).addCell(newSecondCell(dateTimeFormatter.format(data)))
+                else -> {
+                }
+            }
+
+        }
     }
 
     private fun photoCell(image: ByteArray): Cell {

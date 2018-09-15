@@ -24,7 +24,7 @@ object PersonalDetailsMapper {
                     "mail" to personalDetails.mail,
                     "mobile" to personalDetails.mobile,
                     "birthDate" to Optional.ofNullable(personalDetails.birthDate).map { dateFormatter.format(it) }.orElse(""),
-                    "state" to personalDetails.state,
+                    "country" to personalDetails.country,
                     "sex" to personalDetails.sex.name,
                     "taxCode" to personalDetails.taxCode) as Map<String, Any>?)
 
@@ -34,7 +34,7 @@ object PersonalDetailsMapper {
             PersonalDetails(photo = photo,
                     zip = document.getStringOrDefault("zip"),
                     taxCode = document.getStringOrDefault("taxCode"),
-                    state = document.getStringOrDefault("state"),
+                    country = document.getStringOrDefault("country"),
                     sex = Sex.valueOf(document.getStringOrDefault("sex", Sex.NONE.name)),
                     region = document.getStringOrDefault("region"),
                     mobile = document.getStringOrDefault("mobile"),
