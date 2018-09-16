@@ -6,6 +6,7 @@ import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeReposi
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoSkillsRepository
 import it.valeriovaudi.resume.resumeservice.domain.model.Language
 import it.valeriovaudi.resume.resumeservice.domain.model.Resume
+import it.valeriovaudi.resume.resumeservice.domain.model.Skill
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,7 +52,7 @@ class PdfResumePrinterTest {
     @Test
     fun `new resume as pdf`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(Skill("Family 1", listOf("skill_1", "skill_2"))))
 
         mongoResumeRepository.save(emptyResume).toMono().block(Duration.ofMinutes(1))
 
