@@ -56,7 +56,7 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
 
     private fun loadResumeData(resume: Resume) = resume.let {
         Mono.zip(personalDetailsRepository.findOne(it.id).toMono(),
-                skillsRepository.findOne(it.id).toFlux().collectList())
+                skillsRepository.findAll(it.id).toFlux().collectList())
         { t: PersonalDetails, u: List<Skill> ->
             Resume(it.id, it.userName, it.language, t, u)
         }

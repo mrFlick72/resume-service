@@ -44,7 +44,7 @@ class SkillsRouteTest {
                 .exchange()
                 .expectStatus().isNoContent
 
-        Assert.assertNotNull(skillsRepository.findOne(resumeId).toMono().block())
+        Assert.assertNotNull(skillsRepository.findAll(resumeId).toMono().block())
     }
 
     @Test
@@ -74,7 +74,7 @@ class SkillsRouteTest {
                 .exchange()
                 .expectStatus().isNoContent
 
-        val block = skillsRepository.findOne(resumeId).toFlux().collectList().block()
+        val block = skillsRepository.findAll(resumeId).toFlux().collectList().block()
         println("block $block")
         Assert.assertTrue(block.orEmpty().isEmpty())
 

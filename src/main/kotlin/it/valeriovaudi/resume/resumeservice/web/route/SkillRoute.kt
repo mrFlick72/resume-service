@@ -19,7 +19,7 @@ class SkillRoute {
         GET("/resume/{resumeId}/skill")
         {
             val resumeId = it.pathVariable("resumeId")
-            skillsRepository.findOne(resumeId).toMono()
+            skillsRepository.findAll(resumeId).toMono()
                     .flatMap { ok().body(BodyInserters.fromObject(it)) }
         }
         PUT("/resume/{resumeId}/skill")

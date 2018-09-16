@@ -19,7 +19,7 @@ class MongoSkillsRepository(private val mongoTemplate: ReactiveMongoTemplate) : 
         fun findOneQuery(resumeId: String, skillFamily: String) = Query.query(Criteria.where("resumeId").`is`(resumeId).and("skillFamily").`is`(skillFamily))
     }
 
-    override fun findOne(resumeId: String): Publisher<Skill> =
+    override fun findAll(resumeId: String): Publisher<Skill> =
             mongoTemplate.find(findOneQuery(resumeId = resumeId), Document::class.java, collectionName())
                     .map { SkillMapper.fromDocumentToDomain(it) }
 

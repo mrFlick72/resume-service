@@ -5,7 +5,7 @@ import org.reactivestreams.Publisher
 
 interface SkillsRepository {
 
-    fun findOne(resumeId: String): Publisher<Skill>
+    fun findAll(resumeId: String): Publisher<Skill>
 
     fun save(resumeId: String, skill: List<Skill>): Publisher<Skill>
 

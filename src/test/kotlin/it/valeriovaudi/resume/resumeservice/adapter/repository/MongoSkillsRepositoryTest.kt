@@ -46,7 +46,7 @@ class MongoSkillsRepositoryTest {
 
         val resumeId = UUID.randomUUID().toString()
 
-        val allSkills = mongoSkillsRepository.findOne(resumeId).toFlux().collectList()
+        val allSkills = mongoSkillsRepository.findAll(resumeId).toFlux().collectList()
                 .block(Duration.ofMinutes(1))
 
         Assert.assertTrue(allSkills!!.isEmpty())
@@ -65,7 +65,7 @@ class MongoSkillsRepositoryTest {
                 .toMono()
                 .block(Duration.ofMinutes(1))
 
-        val allSkills = mongoSkillsRepository.findOne(resumeId).toFlux().collectList()
+        val allSkills = mongoSkillsRepository.findAll(resumeId).toFlux().collectList()
                 .block(Duration.ofMinutes(1))
 
         Assert.assertNotNull(allSkills)
@@ -87,7 +87,7 @@ class MongoSkillsRepositoryTest {
                 .block(Duration.ofMinutes(1))
 
         mongoSkillsRepository.delete(resumeId, "A_FAMILY").toMono().block(Duration.ofMinutes(1))
-        val allSkills = mongoSkillsRepository.findOne(resumeId).toFlux().collectList()
+        val allSkills = mongoSkillsRepository.findAll(resumeId).toFlux().collectList()
                 .block(Duration.ofMinutes(1))
 
         Assert.assertNotNull(allSkills)
