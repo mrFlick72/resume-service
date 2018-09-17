@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.gridfs.GridFsResource
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import reactor.core.publisher.Mono
@@ -23,8 +24,8 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
     companion object {
         fun collectionName() = "personalDetails"
-        fun findOneQuery(resumeId: String) = Query.query(Criteria.where("resumeId").`is`(resumeId))
-        fun findOneQueryByMetadata(resumeId: String) = Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))
+        fun findOneQuery(resumeId: String) = Query.query(Criteria.where("resumeId").isEqualTo(resumeId))
+        fun findOneQueryByMetadata(resumeId: String) = Query.query(Criteria.where("metadata.resumeId").isEqualTo(resumeId))
     }
 
     override fun delete(resumeId: String) =

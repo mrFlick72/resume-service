@@ -5,14 +5,13 @@ import org.bson.Document
 
 object SkillMapper {
 
-    fun fromDomainToDocument(resumeId: String, skill: Skill) =
+    fun fromDomainToDocument(resumeId: String, skills: List<Skill>) =
             Document(mutableMapOf("resumeId" to resumeId,
-                    "skillFamily" to skill.family,
-                    "skill" to skill.skills) as Map<String, Any>?)
+                    "skills" to skills.map { mapOf("skillFamily" to it.family, "skills" to it.skills) }) as Map<String, Any>?)
 
 
     fun fromDocumentToDomain(document: Document) =
-            Skill(document.getString("skillFamily"),
-                    document.getValue("skill") as List<String>)
+            (document.getValue("skills") as List<Document>)
+                    .map { Skill(it.getString("skillFamily"), it.getValue("skills") as List<String>) }
 
 }

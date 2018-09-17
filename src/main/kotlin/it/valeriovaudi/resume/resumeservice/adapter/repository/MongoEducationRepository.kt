@@ -4,8 +4,15 @@ import it.valeriovaudi.resume.resumeservice.domain.model.Education
 import it.valeriovaudi.resume.resumeservice.domain.repository.EducationRepository
 import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 
 class MongoEducationRepository(private val mongoTemplate: ReactiveMongoTemplate) : EducationRepository {
+
+    companion object {
+        fun collectionName() = "education"
+        fun findOneQuery(resumeId: String) = Query.query(Criteria.where("resumeId").`is`(resumeId))
+    }
 
     override fun findAll(resumeId: String): Publisher<Education> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

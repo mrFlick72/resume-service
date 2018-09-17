@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.mongodb.core.query.isEqualTo
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
@@ -22,9 +23,9 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
 
     companion object {
         fun collectionName() = "resume"
-        fun findOneQuery(resumeId: String) = Query.query(Criteria.where("_id").`is`(resumeId))
+        fun findOneQuery(resumeId: String) = Query.query(Criteria.where("_id").isEqualTo(resumeId))
         fun findByUserNameAndLanguageQuery(userName: String, language: Language) =
-                Query.query(Criteria.where("userName").`is`(userName).and("language").`is`(language.name))
+                Query.query(Criteria.where("userName").`is`(userName).and("language").isEqualTo(language.name))
     }
 
     override fun findOne(resumeId: String): Publisher<Resume> =

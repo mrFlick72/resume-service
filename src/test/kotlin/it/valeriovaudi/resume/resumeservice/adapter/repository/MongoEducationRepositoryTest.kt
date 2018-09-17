@@ -4,6 +4,7 @@ import it.valeriovaudi.resume.resumeservice.domain.model.Education
 import it.valeriovaudi.resume.resumeservice.domain.model.EducationType
 import org.bson.Document
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +28,7 @@ class MongoEducationRepositoryTest {
     lateinit var mongoEducationRepository: MongoEducationRepository
 
     @Test
+    @Ignore
     fun `save a new education`() {
 
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
