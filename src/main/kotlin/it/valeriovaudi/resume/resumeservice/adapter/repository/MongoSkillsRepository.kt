@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update.fromDocument
-import reactor.core.publisher.Flux
+import org.springframework.data.mongodb.core.query.isEqualTo
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 
@@ -17,22 +17,22 @@ class MongoSkillsRepository(private val mongoTemplate: ReactiveMongoTemplate) : 
     companion object {
         fun collectionName() = "skill"
         fun findOneQuery(resumeId: String) = Query.query(Criteria.where("resumeId").`is`(resumeId))
-        fun findOneQuery(resumeId: String, skillFamily: String) = Query.query(Criteria.where("resumeId").`is`(resumeId).and("skillFamily").`is`(skillFamily))
+        fun findOneQuery(resumeId: String, skillFamily: String) =
+                Query.query(Criteria.where("_id").isEqualTo(Document(mapOf("resumeId" to resumeId, "skillFamily" to skillFamily))))
     }
 
     override fun findAll(resumeId: String): Publisher<Skill> =
-            mongoTemplate.findOne(findOneQuery(resumeId = resumeId), Document::class.java, collectionName())
+            mongoTemplate.find(findOneQuery(resumeId = resumeId), Document::class.java, collectionName())
                     .map { SkillMapper.fromDocumentToDomain(it) }
-                    .map { Flux.fromStream(it.stream()) }
-                    .toFlux()
-                    .flatMap { it }
 
 
-    override fun save(resumeId: String, skills: List<Skill>): Publisher<Skill> =
-            mongoTemplate.upsert(findOneQuery(resumeId = resumeId), fromDocument(SkillMapper.fromDomainToDocument(resumeId, skills)), collectionName())
-                    .map { Flux.fromStream(skills.stream()) }
-                    .toFlux()
-                    .flatMap { skills -> skills }
+    override fun save(resumeId: String, skill: Skill): Publisher<Skill> =
+            mongoTemplate.upsert(findOneQuery(resumeId = resumeId, skillFamily = skill.family),
+                    fromDocument(SkillMapper.fromDomainToDocument(resumeId, skill)), collectionName())
+                    .map { skill }
+
+    override fun save(resumeId: String, skill: List<Skill>): Publisher<Skill> =
+            skill.toFlux().flatMap { save(resumeId, it) }
 
     override fun delete(resumeId: String, skillFamily: String): Publisher<Unit> =
             mongoTemplate.remove(findOneQuery(resumeId, skillFamily), collectionName()).flatMap { Mono.just(Unit) }
