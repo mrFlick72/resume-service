@@ -4,7 +4,6 @@ import it.valeriovaudi.resume.resumeservice.domain.model.Skill
 import org.bson.Document
 import org.hamcrest.Matchers
 import org.hamcrest.core.Is
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.junit4.SpringRunner
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
@@ -29,6 +29,7 @@ class MongoSkillsRepositoryTest {
     lateinit var mongoTemplate: ReactiveMongoTemplate
 
     @Test
+    @DirtiesContext
     fun `save skill family`() {
 
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
@@ -44,6 +45,7 @@ class MongoSkillsRepositoryTest {
     }
 
     @Test
+    @DirtiesContext
     fun `save skill family more that once`() {
 
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
@@ -54,17 +56,29 @@ class MongoSkillsRepositoryTest {
                 mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_2", "Skill_2_2", "Skill_3_2"))))
                         .toMono(),
                 mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_3", "Skill_2_3", "Skill_3_3"))))
-                        .toMono()).block(Duration.ofMinutes(1))
+                        .toMono(),
+                mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY2", listOf("Skill_1_3", "Skill_2_3", "Skill_3_3"))))
+                        .toMono())
+                .block(Duration.ofMinutes(1))
+
+        mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_1", "Skill_2", "Skill_3")),
+                Skill("A_FAMILY", listOf("Skill_1_2", "Skill_2_2", "Skill_3_2")),
+                Skill("A_FAMILY", listOf("Skill_1_3", "Skill_2_3", "Skill_3_3")),
+                Skill("A_FAMILY2", listOf("Skill_1_3", "Skill_2_3", "Skill_3_3"))))
+                .toMono()
+                .block(Duration.ofMinutes(1))
+
 
         val acutal = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)), Document::class.java, "skill")
                 .collectList().block(Duration.ofMinutes(1))
         println(acutal)
 
-        assertThat((acutal as List<Document>).size, Is.`is`(1))
+        assertThat((acutal as List<Document>).size, Is.`is`(2))
         assertNotNull(acutal)
     }
 
     @Test
+    @DirtiesContext
     fun `find all skills of a not exist resume`() {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
@@ -77,12 +91,13 @@ class MongoSkillsRepositoryTest {
     }
 
     @Test
+    @DirtiesContext
     fun `find all skills of a resume`() {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
         val resumeId = UUID.randomUUID().toString()
-        mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")),
-                Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3"))))
+        mongoSkillsRepository.save(resumeId, listOf(Skill("ANOTHER_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")),
+                Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3"))))
                 .toMono()
                 .block(Duration.ofMinutes(2))
 
@@ -97,6 +112,7 @@ class MongoSkillsRepositoryTest {
     }
 
     @Test
+    @DirtiesContext
     fun `delete a specific skill family of a resume`() {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
