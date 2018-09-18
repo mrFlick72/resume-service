@@ -30,7 +30,8 @@ class PersonalDetailsRoute {
                     it.bodyToMono(PersonalDetailsRepresentation::class.java)
                             .map { PersonalDetailsRepresentation.fromRepresentationToDomain(it) }
                             .flatMap { personalDetailsRepository.save(resumeId, it).toMono() }
-                            .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
+                            .map { PersonalDetailsRepresentation.fromDomainToRepresentation(it) }
+                            .flatMap {ServerResponse.ok().body(BodyInserters.fromObject(it)) }
                 }
 
                 DELETE("/resume/{resumeId}/personal-details")

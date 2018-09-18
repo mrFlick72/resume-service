@@ -13,19 +13,19 @@ object TestCase {
     fun personalDetailsRepresentation() = PersonalDetailsRepresentation("firstName",
             "lastName", "address", "zip", "city",
             "region", "mail", "mobile", birthDate,
-            "state", Sex.NONE, "taxCode")
+            "country", Sex.NONE, "taxCode")
 
     fun personalDetails() = PersonalDetails(PersonalDetailsPhoto.emptyPersonalDetailsPhoto(), "firstName",
             "lastName", "address", "zip", "city",
             "region", "mail", "mobile", birthDate,
-            "state", Sex.NONE, "taxCode")
+            "country", Sex.NONE, "taxCode")
 
     fun personalDetailsWithPhoto() = this::class.java.classLoader.getResourceAsStream("barca-a-vela.jpg").use {
         
         PersonalDetails(PersonalDetailsPhoto(it.readAllBytes(), "jpg"), "firstName",
                 "lastName", "address", "zip", "city",
                 "region", "mail", "mobile", birthDate,
-                "state", Sex.NONE, "taxCode")
+                "country", Sex.NONE, "taxCode")
     }
 
     fun readFileAsString(location : String) = this::class.java.classLoader.getResourceAsStream(location).use { it.readAllBytes() }.toString(Charset.defaultCharset())
