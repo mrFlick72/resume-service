@@ -59,7 +59,7 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
         Mono.zip(personalDetailsRepository.findOne(it.id).toMono(),
                 skillsRepository.findAll(it.id).toFlux().collectList())
         { t: PersonalDetails, u: List<Skill> ->
-            Resume(it.id, it.userName, it.language, t, u)
+            Resume(it.id, it.userName, it.language, t, u, listOf())
         }
     }
 

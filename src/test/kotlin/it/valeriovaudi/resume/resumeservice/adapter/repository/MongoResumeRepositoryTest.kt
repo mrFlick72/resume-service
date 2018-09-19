@@ -49,7 +49,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `save a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
 
         mongoResumeRepository.save(emptyResume).toMono().block(Duration.ofMinutes(1))
 
@@ -72,7 +72,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find a resume by id`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
 
         val actualResume = mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.findOne(resumeId).toMono())
@@ -85,7 +85,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find a resume by user name`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
 
         val actualResume = mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.findOneByUserName("A_USER", Language.EN).toMono())
@@ -98,7 +98,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `delete a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf())
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
 
         mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.delete(resumeId).toMono())

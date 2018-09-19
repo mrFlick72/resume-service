@@ -52,7 +52,7 @@ class PdfResumePrinterTest {
     @Test
     fun `new resume as pdf`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(Skill("Family 1", listOf("skill_1", "skill_2"))))
+        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(Skill("Family 1", listOf("skill_1", "skill_2"))), listOf())
 
         mongoResumeRepository.save(emptyResume).toMono().block(Duration.ofMinutes(1))
 

@@ -55,7 +55,7 @@ class ResumeRouteTest {
     @WithMockUser(username = "user")
     fun `find resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val resume = Resume(resumeId, "USER_NAME", Language.EN, PersonalDetails.emptyPersonalDetails(), listOf(Skill("FAMILY", listOf("SKILL_1"))))
+        val resume = Resume(resumeId, "USER_NAME", Language.EN, PersonalDetails.emptyPersonalDetails(), listOf(Skill("FAMILY", listOf("SKILL_1"))), listOf())
         val resumeRepresentation = ResumeRepresentation(resumeId, "USER_NAME", Language.EN.name, PersonalDetailsRepresentation.fromDomainToRepresentation(PersonalDetails.emptyPersonalDetails()), listOf(Skill("FAMILY", listOf("SKILL_1"))))
 
         resumeRepository.save(resume).toMono().block(Duration.ofMinutes(1))

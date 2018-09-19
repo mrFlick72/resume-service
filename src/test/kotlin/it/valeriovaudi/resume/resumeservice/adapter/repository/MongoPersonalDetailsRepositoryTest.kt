@@ -1,10 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import it.valeriovaudi.resume.resumeservice.TestCase
-import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
-import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
-import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto.Companion.emptyPersonalDetailsPhoto
-import it.valeriovaudi.resume.resumeservice.domain.model.Sex
 import org.bson.Document
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert
@@ -19,10 +15,8 @@ import org.springframework.data.mongodb.core.query.Query.query
 import org.springframework.data.mongodb.gridfs.GridFsOperations
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.test.context.junit4.SpringRunner
-import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.time.Duration
-import java.time.LocalDate
 import java.util.*
 
 

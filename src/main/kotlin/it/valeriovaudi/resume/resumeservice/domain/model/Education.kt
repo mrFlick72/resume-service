@@ -7,3 +7,6 @@ data class Education(val company : String? = null,
                      val type : EducationType,
                      val dateFrom : LocalDate,
                      val dateTo : LocalDate? = null)
+
+
+enum class EducationType { HING_SCOOL, BARCHELOR_DEGREE, MASTER_DEGREE, PROFESSIONAL_COURSE, CERTIFICATION }
