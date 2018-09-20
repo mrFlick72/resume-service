@@ -9,6 +9,6 @@ interface EducationRepository {
 
     fun save(resumeId: String, education: Education): Publisher<Education>
 
-    fun delete(resumeId: String, educationTitle: String): Publisher<Unit>
+    fun delete(resumeId: String, educationId: String): Publisher<Unit>
 
 }

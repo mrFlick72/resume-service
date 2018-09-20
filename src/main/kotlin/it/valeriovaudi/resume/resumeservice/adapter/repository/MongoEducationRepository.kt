@@ -9,11 +9,15 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
+import reactor.core.publisher.Mono
 
 class MongoEducationRepository(private val mongoTemplate: ReactiveMongoTemplate) : EducationRepository {
 
     companion object {
         fun collectionName() = "education"
+        fun findOneQueryByResumeAndEducationId(resumeId: String, educationId: String) =
+                Query.query(Criteria.where("resumeId").isEqualTo(resumeId).and("_id").isEqualTo(educationId))
+
         fun findOneQueryByResume(resumeId: String) = Query.query(Criteria.where("resumeId").isEqualTo(resumeId))
         fun findOneQuery(educationId: String) = Query.query(Criteria.where("_id").isEqualTo(educationId))
     }
@@ -30,7 +34,7 @@ class MongoEducationRepository(private val mongoTemplate: ReactiveMongoTemplate)
                     .map { education }
 
 
-    override fun delete(resumeId: String, educationTitle: String): Publisher<Unit> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun delete(resumeId: String, educationId: String) =
+            mongoTemplate.remove(findOneQueryByResumeAndEducationId(resumeId, educationId), collectionName())
+                    .flatMap { Mono.just(Unit) }
 }
