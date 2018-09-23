@@ -2,6 +2,7 @@ package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import it.valeriovaudi.resume.resumeservice.domain.model.WorkExperience
 import org.bson.Document
+import org.hamcrest.core.Is
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,6 +13,9 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.test.context.junit4.SpringRunner
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
+import reactor.core.publisher.toMono
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -43,5 +47,32 @@ class MongoWorkExperienceRepositoryTest {
 
         println(actualWorkExperience)
         Assert.assertNotNull(actualWorkExperience)
+    }
+
+    @Test
+    fun `find all work experiences`() {
+        val workExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
+
+        val resumeId = UUID.randomUUID().toString()
+        val aWorkExperience = WorkExperience(UUID.randomUUID().toString(),
+                LocalDate.of(2018, 1, 1),
+                null, "A_COMPANY", listOf(),
+                "A_JOB_DESCRIPTION", listOf())
+
+        val anotherWorkExperience = WorkExperience(UUID.randomUUID().toString(),
+                LocalDate.of(2018, 1, 1),
+                null, "ANOTHER_COMPANY", listOf(),
+                "ANOTHER_JOB_DESCRIPTION", listOf())
+
+        Mono.zip(workExperienceRepository.save(resumeId, aWorkExperience),
+                workExperienceRepository.save(resumeId, anotherWorkExperience))
+                .block(Duration.ofMinutes(1))
+
+        val actualWorkExperience = workExperienceRepository.findAll(resumeId).toFlux().collectList()
+                .block(Duration.ofMinutes(1))
+
+        println(actualWorkExperience)
+        Assert.assertNotNull(actualWorkExperience)
+        Assert.assertThat((actualWorkExperience as MutableList).size, Is.`is`(2))
     }
 }

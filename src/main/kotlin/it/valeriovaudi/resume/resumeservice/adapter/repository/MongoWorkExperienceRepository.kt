@@ -2,6 +2,7 @@ package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import it.valeriovaudi.resume.resumeservice.domain.model.WorkExperience
 import it.valeriovaudi.resume.resumeservice.domain.repository.WorkExperienceRepository
+import org.bson.Document
 import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -18,9 +19,9 @@ class MongoWorkExperienceRepository(private val mongoTemplate: ReactiveMongoTemp
     }
 
 
-    override fun findAll(resumeId: String): Publisher<WorkExperience> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun findAll(resumeId: String) =
+            mongoTemplate.find(findOneQueryByResume(resumeId), Document::class.java, collectionName())
+                    .map { WorkExperienceMapper.fromDocumentToDomain(it) }
 
     override fun save(resumeId: String, workExperience: WorkExperience) =
             mongoTemplate.upsert(findOneQuery(workExperience.id),
