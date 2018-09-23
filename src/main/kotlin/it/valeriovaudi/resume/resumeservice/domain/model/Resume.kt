@@ -4,10 +4,11 @@ data class Resume(val id: String,
                   val userName: String,
                   val language: Language,
                   val personalDetails: PersonalDetails,
-                  val skill: List<Skill>,
-                  val workExperience: List<WorkExperience>) {
+                  val educations: List<Education> = listOf(),
+                  val skill: List<Skill> = listOf(),
+                  val workExperience: List<WorkExperience> = listOf()) {
     companion object {
         fun emptyResume(id: String, userName: String, language: Language) =
-                Resume(id, userName, language, PersonalDetails.emptyPersonalDetails(), listOf(), listOf())
+                Resume(id, userName, language, PersonalDetails.emptyPersonalDetails(), listOf(), listOf(), listOf())
     }
 }

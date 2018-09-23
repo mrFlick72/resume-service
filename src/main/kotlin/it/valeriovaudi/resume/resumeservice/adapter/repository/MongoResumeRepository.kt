@@ -51,15 +51,15 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
 
     private fun saveOtherResumeData(resume: Resume) = resume.let {
         Mono.zip(personalDetailsRepository.save(resumeId = it.id, personalDetails = it.personalDetails).toMono(),
-                if(it.skill.isNotEmpty()) skillsRepository.save(it.id, it.skill).toFlux().collectList() else Mono.just(listOf<Skill>()))
+                if (it.skill.isNotEmpty()) skillsRepository.save(it.id, it.skill).toFlux().collectList() else Mono.just(listOf<Skill>()))
         { t, u -> resume }
     }
 
     private fun loadResumeData(resume: Resume) = resume.let {
         Mono.zip(personalDetailsRepository.findOne(it.id).toMono(),
                 skillsRepository.findAll(it.id).toFlux().collectList())
-        { t: PersonalDetails, u: List<Skill> ->
-            Resume(it.id, it.userName, it.language, t, u, listOf())
+        { personalDetails: PersonalDetails, skills: List<Skill> ->
+            Resume(it.id, it.userName, it.language, personalDetails, listOf(), skills, listOf())
         }
     }
 
