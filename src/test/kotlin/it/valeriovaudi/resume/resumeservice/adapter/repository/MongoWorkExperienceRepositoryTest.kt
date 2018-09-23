@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.test.context.junit4.SpringRunner
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
+import reactor.core.publisher.toMono
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -48,6 +49,59 @@ class MongoWorkExperienceRepositoryTest {
         Assert.assertNotNull(actualWorkExperience)
     }
 
+
+    @Test
+    fun `find one work experience`() {
+        val workExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
+
+        val resumeId = UUID.randomUUID().toString()
+        val aWorkExperience = WorkExperience(UUID.randomUUID().toString(),
+                LocalDate.of(2018, 1, 1),
+                null, "A_COMPANY", listOf(),
+                "A_JOB_DESCRIPTION", listOf())
+
+        val anotherWorkExperience = WorkExperience(UUID.randomUUID().toString(),
+                LocalDate.of(2018, 1, 1),
+                null, "ANOTHER_COMPANY", listOf(),
+                "ANOTHER_JOB_DESCRIPTION", listOf())
+
+        Mono.zip(workExperienceRepository.save(resumeId, aWorkExperience),
+                workExperienceRepository.save(resumeId, anotherWorkExperience))
+                .block(Duration.ofMinutes(1))
+
+
+        val actualWorkExperience = workExperienceRepository.findOne(resumeId, aWorkExperience.id).toMono().block(Duration.ofMinutes(1))
+
+        println(actualWorkExperience)
+        Assert.assertNotNull(actualWorkExperience)
+        Assert.assertThat(actualWorkExperience, Is.`is`(aWorkExperience))
+    }
+
+    @Test
+    fun `find one work experience that do not exist`() {
+        val workExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
+
+        val resumeId = UUID.randomUUID().toString()
+        val aWorkExperience = WorkExperience(UUID.randomUUID().toString(),
+                LocalDate.of(2018, 1, 1),
+                null, "A_COMPANY", listOf(),
+                "A_JOB_DESCRIPTION", listOf())
+
+        val anotherWorkExperience = WorkExperience(UUID.randomUUID().toString(),
+                LocalDate.of(2018, 1, 1),
+                null, "ANOTHER_COMPANY", listOf(),
+                "ANOTHER_JOB_DESCRIPTION", listOf())
+
+        Mono.zip(workExperienceRepository.save(resumeId, aWorkExperience),
+                workExperienceRepository.save(resumeId, anotherWorkExperience))
+                .block(Duration.ofMinutes(1))
+
+
+        val actualWorkExperience = workExperienceRepository.findOne(resumeId, "").toMono().block(Duration.ofMinutes(1))
+
+        println(actualWorkExperience)
+        Assert.assertNull(actualWorkExperience)
+    }
 
     @Test
     fun `find all work experiences`() {
@@ -109,7 +163,8 @@ class MongoWorkExperienceRepositoryTest {
                 workExperienceRepository.save(resumeId, anotherWorkExperience))
                 .block(Duration.ofMinutes(1))
 
-        workExperienceRepository.delete(aWorkExperience.id).block(Duration.ofMinutes(1))
+        workExperienceRepository.delete(resumeId, aWorkExperience.id).block(Duration.ofMinutes(1))
+
         val actualWorkExperienceList = workExperienceRepository.findAll(resumeId).toFlux().collectList()
                 .block(Duration.ofMinutes(1))
 

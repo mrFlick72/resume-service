@@ -16,26 +16,28 @@ class MongoWorkExperienceRepository(private val mongoTemplate: ReactiveMongoTemp
     companion object {
         fun collectionName() = "workExperience"
         fun findOneQueryByResume(resumeId: String) = Query.query(Criteria.where("resumeId").`is`(resumeId))
-        fun findOneQuery(workExperienceId: String) = Query.query(Criteria.where("_id").isEqualTo(workExperienceId))
+        fun findOneQuery(resumeId: String, workExperienceId: String) =
+                Query.query(Criteria.where("_id").isEqualTo(workExperienceId).and("resumeId").isEqualTo(resumeId))
     }
 
-    override fun findOne(workExperienceId: String): Publisher<WorkExperience> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun findOne(resumeId: String, workExperienceId: String) =
+            mongoTemplate.findOne(findOneQuery(resumeId, workExperienceId), Document::class.java, collectionName())
+                    .map { WorkExperienceMapper.fromDocumentToDomain(it) }
+
 
     override fun findAll(resumeId: String) =
             mongoTemplate.find(findOneQueryByResume(resumeId), Document::class.java, collectionName())
                     .map { WorkExperienceMapper.fromDocumentToDomain(it) }
 
     override fun save(resumeId: String, workExperience: WorkExperience) =
-            mongoTemplate.upsert(findOneQuery(workExperience.id),
+            mongoTemplate.upsert(findOneQuery(resumeId = resumeId, workExperienceId = workExperience.id),
                     Update.fromDocument(WorkExperienceMapper.fromDomainToDocument(resumeId, workExperience)),
                     collectionName())
                     .map { workExperience }
 
 
-    override fun delete(workExperienceId: String) =
-            mongoTemplate.remove(findOneQuery(workExperienceId), collectionName())
+    override fun delete(resumeId: String, workExperienceId: String) =
+            mongoTemplate.remove(findOneQuery(resumeId = resumeId, workExperienceId = workExperienceId), collectionName())
                     .flatMap { Mono.just(Unit) }
 
 
