@@ -7,8 +7,10 @@ interface WorkExperienceRepository {
 
     fun findAll(resumeId: String): Publisher<WorkExperience>
 
+    fun findOne(workExperienceId: String): Publisher<WorkExperience>
+
     fun save(resumeId: String, workExperience: WorkExperience): Publisher<WorkExperience>
 
-    fun delete(resumeId: String, workExperienceId: String): Publisher<Unit>
+    fun delete(workExperienceId: String): Publisher<Unit>
 
 }

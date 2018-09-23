@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
+import reactor.core.publisher.Mono
 
 class MongoWorkExperienceRepository(private val mongoTemplate: ReactiveMongoTemplate) : WorkExperienceRepository {
 
@@ -18,6 +19,9 @@ class MongoWorkExperienceRepository(private val mongoTemplate: ReactiveMongoTemp
         fun findOneQuery(workExperienceId: String) = Query.query(Criteria.where("_id").isEqualTo(workExperienceId))
     }
 
+    override fun findOne(workExperienceId: String): Publisher<WorkExperience> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override fun findAll(resumeId: String) =
             mongoTemplate.find(findOneQueryByResume(resumeId), Document::class.java, collectionName())
@@ -30,8 +34,9 @@ class MongoWorkExperienceRepository(private val mongoTemplate: ReactiveMongoTemp
                     .map { workExperience }
 
 
-    override fun delete(resumeId: String, workExperienceId: String): Publisher<Unit> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun delete(workExperienceId: String) =
+            mongoTemplate.remove(findOneQuery(workExperienceId), collectionName())
+                    .flatMap { Mono.just(Unit) }
+
 
 }
