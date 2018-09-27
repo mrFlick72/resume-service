@@ -43,6 +43,7 @@ class PdfResumePrinterTest {
 
     @Before
     fun setUp() {
+        mongoWorkExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
         mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
         mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)

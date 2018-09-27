@@ -1,8 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.web.config
 
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoPersonalDetailsRepository
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeRepository
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoSkillsRepository
+import it.valeriovaudi.resume.resumeservice.adapter.repository.*
 import org.springframework.context.support.beans
 
 object RepositoryConfig {
@@ -11,5 +9,7 @@ object RepositoryConfig {
         bean<MongoSkillsRepository>()
         bean<MongoPersonalDetailsRepository>()
         bean<MongoResumeRepository>()
+        bean<MongoWorkExperienceRepository>()
+        bean<MongoEducationRepository>()
     }
 }
