@@ -2,9 +2,6 @@ package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import it.valeriovaudi.resume.resumeservice.TestCase
 import it.valeriovaudi.resume.resumeservice.domain.model.*
-import it.valeriovaudi.resume.resumeservice.domain.repository.EducationRepository
-import it.valeriovaudi.resume.resumeservice.domain.repository.SkillsRepository
-import org.assertj.core.api.Assertions
 import org.bson.Document
 import org.hamcrest.core.Is
 import org.junit.Assert
@@ -39,14 +36,21 @@ class MongoResumeRepositoryTest {
 
     lateinit var mongoSkillsRepository: MongoSkillsRepository
 
-    lateinit var educationRepository: MongoEducationRepository
+    lateinit var mongoEducationRepository: MongoEducationRepository
+
+    lateinit var mongoWorkExperienceRepository: MongoWorkExperienceRepository
 
     @Before
     fun setUp() {
-        educationRepository = MongoEducationRepository(mongoTemplate)
+        mongoWorkExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
+        mongoEducationRepository = MongoEducationRepository(mongoTemplate)
         mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
         mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)
-        mongoResumeRepository = MongoResumeRepository(mongoTemplate, mongoPersonalDetailsRepository, mongoSkillsRepository, educationRepository)
+        mongoResumeRepository = MongoResumeRepository(mongoTemplate,
+                mongoPersonalDetailsRepository,
+                mongoSkillsRepository,
+                mongoEducationRepository,
+                mongoWorkExperienceRepository)
     }
 
     @Test
@@ -76,11 +80,11 @@ class MongoResumeRepositoryTest {
         val resumeId = UUID.randomUUID().toString()
         val skills = listOf(Skill("FAMILY", listOf("SKILL_1")))
         val educations = listOf(Education(id = "1", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION), Education(id = "2", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION))
-        val workExperiences = listOf(WorkExperience(id = "1", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")))
+        val workExperiences = listOf(WorkExperience(id = "1", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")), WorkExperience(id = "2", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")))
         val resume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(),
                 skill = skills,
                 educations = educations,
-                workExperience = listOf())
+                workExperience = workExperiences)
 
         mongoResumeRepository.save(resume).toMono().block(Duration.ofMinutes(1))
 
@@ -114,10 +118,11 @@ class MongoResumeRepositoryTest {
         Assert.assertThat((actualEducation as MutableList).size, Is.`is`(2))
 
         println("workExperience")
-        Assert.assertNotNull(mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)),
+        val actualWorkExperience = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "workExperience").collectList()
-                .block(Duration.ofMinutes(2)))
-
+                .block(Duration.ofMinutes(2))
+        Assert.assertNotNull(actualWorkExperience)
+        Assert.assertThat((actualWorkExperience as MutableList).size, Is.`is`(2))
     }
 
     @Test

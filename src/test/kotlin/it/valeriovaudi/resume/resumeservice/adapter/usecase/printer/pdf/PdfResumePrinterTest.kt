@@ -1,10 +1,7 @@
 package it.valeriovaudi.resume.resumeservice.adapter.usecase.printer.pdf
 
 import it.valeriovaudi.resume.resumeservice.TestCase
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoEducationRepository
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoPersonalDetailsRepository
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeRepository
-import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoSkillsRepository
+import it.valeriovaudi.resume.resumeservice.adapter.repository.*
 import it.valeriovaudi.resume.resumeservice.domain.model.Language
 import it.valeriovaudi.resume.resumeservice.domain.model.Resume
 import it.valeriovaudi.resume.resumeservice.domain.model.Skill
@@ -40,6 +37,8 @@ class PdfResumePrinterTest {
 
     lateinit var mongoEducationRepository: MongoEducationRepository
 
+    lateinit var mongoWorkExperienceRepository: MongoWorkExperienceRepository
+
     lateinit var pdfResumePrinter: PdfResumePrinter
 
     @Before
@@ -47,7 +46,11 @@ class PdfResumePrinterTest {
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
         mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
         mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)
-        mongoResumeRepository = MongoResumeRepository(mongoTemplate, mongoPersonalDetailsRepository, mongoSkillsRepository, mongoEducationRepository)
+        mongoResumeRepository = MongoResumeRepository(mongoTemplate,
+                mongoPersonalDetailsRepository,
+                mongoSkillsRepository,
+                mongoEducationRepository,
+                mongoWorkExperienceRepository)
 
         pdfResumePrinter = PdfResumePrinter(mongoResumeRepository)
     }

@@ -17,8 +17,8 @@ import reactor.core.publisher.toMono
 class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
                             private val personalDetailsRepository: MongoPersonalDetailsRepository,
                             private val skillsRepository: MongoSkillsRepository,
-                            private val educationRepository: MongoEducationRepository
-) : ResumeRepository {
+                            private val educationRepository: MongoEducationRepository,
+                            private val workExperienceRepository: MongoWorkExperienceRepository) : ResumeRepository {
 
     companion object {
         fun collectionName() = "resume"
@@ -51,7 +51,8 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
     private fun saveOtherResumeData(resume: Resume) = resume.let {
         Mono.zip(personalDetailsRepository.save(resumeId = resume.id, personalDetails = resume.personalDetails).toMono(),
                 if (resume.skill.isNotEmpty()) skillsRepository.save(resume.id, resume.skill).toFlux().collectList() else Mono.just(listOf<Skill>()),
-                if (resume.educations.isNotEmpty()) resume.educations.toFlux().flatMap { educationRepository.save(resume.id, it) }.collectList() else Mono.just(listOf<Education>()))
+                if (resume.educations.isNotEmpty()) resume.educations.toFlux().flatMap { educationRepository.save(resume.id, it) }.collectList() else Mono.just(listOf<Education>()),
+                if (resume.workExperience.isNotEmpty()) resume.workExperience.toFlux().flatMap { workExperienceRepository.save(resume.id, it) }.collectList() else Mono.just(listOf<WorkExperience>()))
                 .map { tuple -> resume }
 
     }
