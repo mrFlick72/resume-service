@@ -1,6 +1,7 @@
 package it.valeriovaudi.resume.resumeservice.adapter.usecase.printer.pdf
 
 import it.valeriovaudi.resume.resumeservice.TestCase
+import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoEducationRepository
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoPersonalDetailsRepository
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeRepository
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoSkillsRepository
@@ -37,13 +38,16 @@ class PdfResumePrinterTest {
 
     lateinit var mongoSkillsRepository: MongoSkillsRepository
 
+    lateinit var mongoEducationRepository: MongoEducationRepository
+
     lateinit var pdfResumePrinter: PdfResumePrinter
 
     @Before
     fun setUp() {
+        mongoEducationRepository = MongoEducationRepository(mongoTemplate)
         mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
         mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)
-        mongoResumeRepository = MongoResumeRepository(mongoTemplate, mongoPersonalDetailsRepository, mongoSkillsRepository)
+        mongoResumeRepository = MongoResumeRepository(mongoTemplate, mongoPersonalDetailsRepository, mongoSkillsRepository, mongoEducationRepository)
 
         pdfResumePrinter = PdfResumePrinter(mongoResumeRepository)
     }

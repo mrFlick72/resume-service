@@ -1,10 +1,7 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import com.mongodb.client.result.UpdateResult
-import it.valeriovaudi.resume.resumeservice.domain.model.Language
-import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
-import it.valeriovaudi.resume.resumeservice.domain.model.Resume
-import it.valeriovaudi.resume.resumeservice.domain.model.Skill
+import it.valeriovaudi.resume.resumeservice.domain.model.*
 import it.valeriovaudi.resume.resumeservice.domain.repository.ResumeRepository
 import org.bson.Document
 import org.reactivestreams.Publisher
@@ -19,7 +16,9 @@ import reactor.core.publisher.toMono
 
 class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
                             private val personalDetailsRepository: MongoPersonalDetailsRepository,
-                            private val skillsRepository: MongoSkillsRepository) : ResumeRepository {
+                            private val skillsRepository: MongoSkillsRepository,
+                            private val educationRepository: MongoEducationRepository
+) : ResumeRepository {
 
     companion object {
         fun collectionName() = "resume"
@@ -50,9 +49,11 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
 
 
     private fun saveOtherResumeData(resume: Resume) = resume.let {
-        Mono.zip(personalDetailsRepository.save(resumeId = it.id, personalDetails = it.personalDetails).toMono(),
-                if (it.skill.isNotEmpty()) skillsRepository.save(it.id, it.skill).toFlux().collectList() else Mono.just(listOf<Skill>()))
-        { t, u -> resume }
+        Mono.zip(personalDetailsRepository.save(resumeId = resume.id, personalDetails = resume.personalDetails).toMono(),
+                if (resume.skill.isNotEmpty()) skillsRepository.save(resume.id, resume.skill).toFlux().collectList() else Mono.just(listOf<Skill>()),
+                if (resume.educations.isNotEmpty()) resume.educations.toFlux().flatMap { educationRepository.save(resume.id, it) }.collectList() else Mono.just(listOf<Education>()))
+                .map { tuple -> resume }
+
     }
 
     private fun loadResumeData(resume: Resume) = resume.let {
