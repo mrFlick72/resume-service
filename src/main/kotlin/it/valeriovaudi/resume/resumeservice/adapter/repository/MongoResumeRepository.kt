@@ -30,7 +30,7 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
     override fun findOne(resumeId: String): Publisher<Resume> =
             mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName())
                     .map { ResumeMapper.fromDocumentToDomain(it) }
-                    .flatMap { resume -> println("OK"); loadResumeData(resume) }
+                    .flatMap { loadResumeData(it) }
 
     override fun findOneByUserName(userName: String, language: Language): Publisher<Resume> =
             mongoTemplate.findOne(findByUserNameAndLanguageQuery(userName, language), Document::class.java, collectionName())
@@ -57,12 +57,10 @@ class MongoResumeRepository(private val mongoTemplate: ReactiveMongoTemplate,
 
     }
 
-    private fun loadResumeData(resume: Resume) = resume.let {
-        Mono.zip(personalDetailsRepository.findOne(it.id).toMono(),
-                skillsRepository.findAll(it.id).toFlux().collectList())
-        { personalDetails: PersonalDetails, skills: List<Skill> ->
-            Resume(it.id, it.userName, it.language, personalDetails, listOf(), skills, listOf())
-        }
-    }
+    private fun loadResumeData(resume: Resume) = Mono.zip(personalDetailsRepository.findOne(resume.id).toMono(),
+            educationRepository.findAll(resume.id).toFlux().collectList(),
+            skillsRepository.findAll(resume.id).toFlux().collectList(),
+            workExperienceRepository.findAll(resume.id).toFlux().collectList())
+            .map { Resume(resume.id, resume.userName, resume.language, it.t1, it.t2, it.t3, it.t4) }
 
 }

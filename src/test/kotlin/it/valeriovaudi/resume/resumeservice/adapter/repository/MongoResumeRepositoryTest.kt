@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.test.context.junit4.SpringRunner
+import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.time.Duration
 import java.time.LocalDate
@@ -56,7 +57,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `save a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
+        val emptyResume = anEmptyResume(resumeId)
 
         mongoResumeRepository.save(emptyResume).toMono().block(Duration.ofMinutes(1))
 
@@ -78,16 +79,8 @@ class MongoResumeRepositoryTest {
     @Test
     fun `save a not empty resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val skills = listOf(Skill("FAMILY", listOf("SKILL_1")))
-        val educations = listOf(Education(id = "1", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION), Education(id = "2", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION))
-        val workExperiences = listOf(WorkExperience(id = "1", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")), WorkExperience(id = "2", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")))
-        val resume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(),
-                skill = skills,
-                educations = educations,
-                workExperience = workExperiences)
-
-        mongoResumeRepository.save(resume).toMono().block(Duration.ofMinutes(1))
-
+        val resume = aResume(resumeId)
+        mongoResumeRepository.save(resume!!).toMono().block(Duration.ofMinutes(1))
 
         val actualResumeDocument = mongoTemplate.findOne(Query.query(Criteria.where("_id").`is`(resumeId)),
                 Document::class.java, "resume")
@@ -128,9 +121,40 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find a resume by id`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
+        val emptyResume = anEmptyResume(resumeId)
 
         val actualResume = mongoResumeRepository.save(emptyResume).toMono()
+                .then(mongoResumeRepository.findOne(resumeId).toMono())
+                .block(Duration.ofMinutes(1))
+
+        println("details")
+        Assert.assertNotNull(actualResume!!.personalDetails)
+        Assert.assertNotNull(actualResume.personalDetails.photo)
+
+        println("photo")
+
+        println("skills")
+        val actualSkills = actualResume.skill
+        Assert.assertNotNull(actualSkills)
+        Assert.assertThat((actualSkills as MutableList).size, Is.`is`(1))
+
+        println("education")
+        val actualEducation = actualResume.educations
+        Assert.assertNotNull(actualEducation)
+        Assert.assertThat((actualEducation as MutableList).size, Is.`is`(2))
+
+        println("workExperience")
+        val actualWorkExperience = actualResume.workExperience
+        Assert.assertNotNull(actualWorkExperience)
+        Assert.assertThat((actualWorkExperience as MutableList).size, Is.`is`(2))
+    }
+
+    @Test
+    fun `find an empty resume by id`() {
+        val resumeId = UUID.randomUUID().toString()
+        val resume = aResume(resumeId)
+
+        val actualResume = mongoResumeRepository.save(resume!!).toMono()
                 .then(mongoResumeRepository.findOne(resumeId).toMono())
                 .block(Duration.ofMinutes(1))
 
@@ -141,7 +165,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find a resume by user name`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
+        val emptyResume = anEmptyResume(resumeId)
 
         val actualResume = mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.findOneByUserName("A_USER", Language.EN).toMono())
@@ -154,7 +178,7 @@ class MongoResumeRepositoryTest {
     @Test
     fun `delete a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
+        val emptyResume = anEmptyResume(resumeId)
 
         mongoResumeRepository.save(emptyResume).toMono()
                 .then(mongoResumeRepository.delete(resumeId).toMono())
@@ -169,4 +193,20 @@ class MongoResumeRepositoryTest {
         Assert.assertNotNull(gridFsTemplate.findOne(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))))
         Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
     }
+
+    private fun anEmptyResume(resumeId: String) =
+            Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), listOf(), listOf())
+
+    private fun aResume(resumeId: String) =
+            Mono.zip(Mono.just(listOf(Skill("FAMILY", listOf("SKILL_1")))),
+                    Mono.just(listOf(Education(id = "1", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION), Education(id = "2", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION))),
+                    Mono.just(listOf(WorkExperience(id = "1", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")), WorkExperience(id = "2", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")))))
+                    .map {
+                        Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(),
+                                skill = it.t1,
+                                educations = it.t2,
+                                workExperience = it.t3)
+                    }.block()
+
+
 }
