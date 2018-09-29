@@ -17,6 +17,7 @@ import java.nio.file.Files
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import javax.swing.text.html.Option
 
 class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : ResumePrinter {
 
@@ -82,22 +83,14 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
         table.addCell(CellFactory.newSectionCell("Educations")).addCell(CellFactory.newSecondCell(""))
 
         educations.forEach { education ->
-            Introspector.getBeanInfo(Education::class.java).propertyDescriptors.filter { it.name != "id" }.map {
-                val data = it.readMethod.invoke(education)
-                val label = label.getOrDefault(it.name, "")
-
-                when (data) {
-                    is String -> if (data.isNotEmpty()) table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(data)) else {
-                    }
-                    is LocalDate -> table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(data)))
-                    else -> {
-                    }
-                }
-            }
+            Optional.ofNullable(education.company).ifPresent({ table.addCell(CellFactory.newFirstCell("company")).addCell(CellFactory.newSecondCell(it)) })
+            table.addCell(CellFactory.newFirstCell("title")).addCell(CellFactory.newSecondCell(education.title))
+            table.addCell(CellFactory.newFirstCell("type")).addCell(CellFactory.newSecondCell(education.type.name))
+            table.addCell(CellFactory.newFirstCell("dateFrom")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(education.dateFrom)))
+            Optional.ofNullable(education.dateTo).ifPresent({ table.addCell(CellFactory.newFirstCell("dateTo")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
             newEmptyCells(table)
         }
     }
-
 
     fun newSkillCells(table: Table, skill: List<Skill>) {
         table.addCell(CellFactory.newSectionCell("Skills")).addCell(CellFactory.newSecondCell(""))
@@ -112,20 +105,14 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
 
     fun newWorkExperienceCells(table: Table, workExperience: List<WorkExperience>, label: Map<String, String>) {
         table.addCell(CellFactory.newSectionCell("Work Experiences")).addCell(CellFactory.newSecondCell(""))
-
         workExperience.forEach { workExperience ->
-            Introspector.getBeanInfo(WorkExperience::class.java).propertyDescriptors.filter { it.name != "id" }.map {
-                val data = it.readMethod.invoke(workExperience)
-                val label = label.getOrDefault(it.name, "")
+            table.addCell(CellFactory.newFirstCell("company")).addCell(CellFactory.newSecondCell(workExperience.company))
+            table.addCell(CellFactory.newFirstCell("startDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(workExperience.startDate)))
+            Optional.ofNullable(workExperience.endDate).ifPresent({ table.addCell(CellFactory.newFirstCell("endDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+//            table.addCell(CellFactory.newFirstCell("commitments")).addCell(newListOfItemCell(workExperience.commitments))
+            table.addCell(CellFactory.newFirstCell("jobDescription")).addCell(CellFactory.newSecondCell(workExperience.jobDescription))
+//            table.addCell(CellFactory.newFirstCell("technologies")).addCell(CellFactory.newSecondCell(workExperience.technologies))
 
-                when (data) {
-                    is String -> if (data.isNotEmpty()) table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(data)) else {
-                    }
-                    is LocalDate -> table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(data)))
-                    else -> {
-                    }
-                }
-            }
             newEmptyCells(table)
         }
     }
@@ -133,5 +120,4 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
     fun newEmptyCells(table: Table) {
         table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(""))
     }
-
 }
