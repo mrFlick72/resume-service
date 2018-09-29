@@ -60,9 +60,8 @@ class PdfResumePrinterTest {
     @Test
     fun `new resume as pdf`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(), skill = listOf(Skill("Family 1", listOf("skill_1", "skill_2"))))
-
-        mongoResumeRepository.save(emptyResume).toMono().block(Duration.ofMinutes(1))
+        val resume = TestCase.aResume(resumeId)!!
+        mongoResumeRepository.save(resume).toMono().block(Duration.ofMinutes(1))
 
         val inputStream = pdfResumePrinter.printResumeFor(resumeId)
 

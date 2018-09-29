@@ -6,6 +6,7 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Table
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeRepository
+import it.valeriovaudi.resume.resumeservice.domain.model.Education
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.Skill
 import it.valeriovaudi.resume.resumeservice.domain.usecase.ResumePrinter
@@ -51,6 +52,9 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
                     newPersonalDetailsCells(table, it.personalDetails)
                     newEmptyCells(table)
                     newSkillCells(table, it.skill)
+                    newEmptyCells(table)
+                    newEducationsCells(table, it.educations)
+
                     document.add(table)
 
                     Mono.just(Unit)
@@ -74,9 +78,23 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
         }
     }
 
+    fun newEducationsCells(table: Table, educations: List<Education>) {
+        table.addCell(CellFactory.newSectionCell("Educations")).addCell(CellFactory.newSecondCell(""))
 
-    fun newEmptyCells(table: Table) {
-        table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(""))
+        educations.forEach { education ->
+            Introspector.getBeanInfo(Education::class.java).propertyDescriptors.filter { it.name != "id" }.map {
+                val data = it.readMethod.invoke(education)
+                val label = ResumeLabelRepository.resumeDefaultLabel().getOrDefault(it.name, "")
+
+                when (data) {
+                    is String -> table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(data))
+                    is LocalDate -> table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(data)))
+                    else -> {
+                    }
+                }
+            }
+            newEmptyCells(table)
+        }
     }
 
     fun newSkillCells(table: Table, skill: List<Skill>) {
@@ -88,6 +106,10 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
                 table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(it))
             }
         }
+    }
+
+    fun newEmptyCells(table: Table) {
+        table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(""))
     }
 
 }
