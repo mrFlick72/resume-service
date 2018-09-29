@@ -22,6 +22,9 @@ object ResumeLabelRepository {
                     "title" to "Title",
                     "type" to "Type",
                     "dateFrom" to "Starting Date",
-                    "dateTo" to "Ending Date")
-
+                    "startDate" to "Starting Date",
+                    "dateTo" to "Ending Date",
+                    "commitments" to "Commitments",
+                    "jobDescription" to "Job Description",
+                    "technologies" to "Technologies")
 }
