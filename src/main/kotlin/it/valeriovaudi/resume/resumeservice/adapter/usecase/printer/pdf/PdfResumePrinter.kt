@@ -130,7 +130,6 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
         }
     }
 
-
     fun newEmptyCells(table: Table) {
         table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(""))
     }
