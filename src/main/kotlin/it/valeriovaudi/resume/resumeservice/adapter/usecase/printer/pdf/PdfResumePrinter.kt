@@ -49,11 +49,11 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
                     table.setPaddingRight(25f)
                     table.setMarginRight(25f)
 
-                    newPersonalDetailsCells(table, it.personalDetails)
+                    newPersonalDetailsCells(table, it.personalDetails, ResumeLabelRepository.resumeDefaultLabel())
                     newEmptyCells(table)
                     newSkillCells(table, it.skill)
                     newEmptyCells(table)
-                    newEducationsCells(table, it.educations)
+                    newEducationsCells(table, it.educations, ResumeLabelRepository.resumeDefaultLabel())
 
                     document.add(table)
 
@@ -61,13 +61,13 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
                 }.block()
     }
 
-    fun newPersonalDetailsCells(table: Table, personalDetails: PersonalDetails) {
+    fun newPersonalDetailsCells(table: Table, personalDetails: PersonalDetails, label: Map<String, String>) {
         table.addCell(CellFactory.newSectionCell("Resume")).addCell(CellFactory.photoCell(personalDetails.photo.content))
         table.addCell(CellFactory.newSectionCell("Personal Details")).addCell(CellFactory.newSecondCell(""))
 
         Introspector.getBeanInfo(personalDetails::class.java).propertyDescriptors.map {
             val data = it.readMethod.invoke(personalDetails)
-            val label = ResumeLabelRepository.resumeDefaultLabel().getOrDefault(it.name, "")
+            val label = label.getOrDefault(it.name, "")
 
             when (data) {
                 is String -> table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(data))
@@ -78,16 +78,16 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
         }
     }
 
-    fun newEducationsCells(table: Table, educations: List<Education>) {
+    fun newEducationsCells(table: Table, educations: List<Education>, label: Map<String, String>) {
         table.addCell(CellFactory.newSectionCell("Educations")).addCell(CellFactory.newSecondCell(""))
 
         educations.forEach { education ->
             Introspector.getBeanInfo(Education::class.java).propertyDescriptors.filter { it.name != "id" }.map {
                 val data = it.readMethod.invoke(education)
-                val label = ResumeLabelRepository.resumeDefaultLabel().getOrDefault(it.name, "")
+                val label = label.getOrDefault(it.name, "")
 
                 when (data) {
-                    is String -> table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(data))
+                    is String -> if (data.isNotEmpty()) table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(data)) else {}
                     is LocalDate -> table.addCell(CellFactory.newFirstCell(label)).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(data)))
                     else -> {
                     }
@@ -96,6 +96,7 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
             newEmptyCells(table)
         }
     }
+
 
     fun newSkillCells(table: Table, skill: List<Skill>) {
         table.addCell(CellFactory.newSectionCell("Skills")).addCell(CellFactory.newSecondCell(""))
