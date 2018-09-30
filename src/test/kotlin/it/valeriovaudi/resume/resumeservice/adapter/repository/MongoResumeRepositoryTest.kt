@@ -121,10 +121,10 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find a resume by id`() {
         val resumeId = UUID.randomUUID().toString()
-        val emptyResume = anEmptyResume(resumeId)
+        val resume = aResume(resumeId)!!
 
-        val actualResume = mongoResumeRepository.save(emptyResume).toMono()
-                .then(mongoResumeRepository.findOne(resumeId).toMono())
+        val actualResume = mongoResumeRepository.save(resume).toMono()
+                .flatMap { mongoResumeRepository.findOne(resumeId).toMono() }
                 .block(Duration.ofMinutes(1))
 
         println("details")
@@ -152,9 +152,9 @@ class MongoResumeRepositoryTest {
     @Test
     fun `find an empty resume by id`() {
         val resumeId = UUID.randomUUID().toString()
-        val resume = aResume(resumeId)
+        val resume = anEmptyResume(resumeId)
 
-        val actualResume = mongoResumeRepository.save(resume!!).toMono()
+        val actualResume = mongoResumeRepository.save(resume).toMono()
                 .then(mongoResumeRepository.findOne(resumeId).toMono())
                 .block(Duration.ofMinutes(1))
 
@@ -200,13 +200,10 @@ class MongoResumeRepositoryTest {
     private fun aResume(resumeId: String) =
             Mono.zip(Mono.just(listOf(Skill("FAMILY", listOf("SKILL_1")))),
                     Mono.just(listOf(Education(id = "1", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION), Education(id = "2", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION))),
-                    Mono.just(listOf(WorkExperience(id = "1", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")), WorkExperience(id = "2", startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")))))
+                    Mono.just(listOf(WorkExperience(id = UUID.randomUUID().toString(), startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")),
+                            WorkExperience(id = UUID.randomUUID().toString(), startDate = LocalDate.of(2018, 1, 1), company = "A_COMPANY", jobDescription = "A_JOB_DESCRIPTION", technologies = listOf("TAEH_1", "TAEH_2"), commitments = listOf("COMMITMENTS_1", "COMMITMENTS_2")))))
                     .map {
                         Resume(resumeId, "A_USER", Language.EN, TestCase.personalDetailsWithPhoto(),
-                                skill = it.t1,
-                                educations = it.t2,
-                                workExperience = it.t3)
+                                skill = it.t1, educations = it.t2, workExperience = it.t3)
                     }.block()
-
-
 }
