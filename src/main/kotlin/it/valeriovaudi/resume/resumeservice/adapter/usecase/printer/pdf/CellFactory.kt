@@ -12,7 +12,6 @@ import com.itextpdf.layout.element.Paragraph
 
 object CellFactory {
 
-    val ROW_COLOR: Color = DeviceRgb(253, 253, 248)
 
     fun photoCell(image: ByteArray): Cell {
         val newCell = newCell()
@@ -35,11 +34,9 @@ object CellFactory {
         return newCell().add(Paragraph(content))
     }
 
-    fun newCell(color: Color = ROW_COLOR,
-                withRightBorder: Boolean = false, isFirstColumn: Boolean = false): Cell {
+    fun newCell(withRightBorder: Boolean = false, isFirstColumn: Boolean = false): Cell {
         return Cell().setWidth(PageSize.A4.width * (if (isFirstColumn) 0.25f else 0.80f))
-                .setBorder(Border.NO_BORDER)
-                .setBackgroundColor(color).setFontSize(10f)
+                .setBorder(Border.NO_BORDER).setFontSize(10f)
                 .let {
                     if (withRightBorder) {
                         it.setBorderRight(SolidBorder(1f))

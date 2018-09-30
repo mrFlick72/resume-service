@@ -12,11 +12,20 @@ class EducationsPdfSectionProducer(val dateTimeFormatter: DateTimeFormatter = Pd
         table.addCell(CellFactory.newSectionCell("Educations")).addCell(CellFactory.newSecondCell(""))
 
         educations.forEach { education ->
-            Optional.ofNullable(education.company).ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("company", ""))).addCell(CellFactory.newSecondCell(it)) })
+            Optional.ofNullable(education.company)
+                    .ifPresent({
+                        if (it.isNotEmpty()) {
+                            table.addCell(CellFactory.newFirstCell(label.getOrDefault("company", ""))).addCell(CellFactory.newSecondCell(it))
+                        }
+                    })
+
             table.addCell(CellFactory.newFirstCell(label.getOrDefault("title", ""))).addCell(CellFactory.newSecondCell(education.title))
             table.addCell(CellFactory.newFirstCell(label.getOrDefault("type", ""))).addCell(CellFactory.newSecondCell(education.type.name))
             table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateFrom", ""))).addCell(CellFactory.newSecondCell(PdfResumePrinter.dateTimeFormatter.format(education.dateFrom)))
-            Optional.ofNullable(education.dateTo).ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateTo", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+
+            Optional.ofNullable(education.dateTo)
+                    .ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateTo", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+
             PdfResumePrinter.newEmptyCells(table)
         }
     }

@@ -22,14 +22,14 @@ class WorkExperiencePdfSectionProducer(val dateTimeFormatter: DateTimeFormatter 
             Optional.ofNullable(workExperience.endDate).ifPresent({ innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("endDate", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
 
             val commitmentsTable = Table(1)
-            workExperience.commitments.forEach { commitmentsTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it))) }
+            workExperience.commitments.forEach { commitmentsTable.addCell(CellFactory.newCell().add(Paragraph(it)).setBold()) }
             innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("commitments", "")))
                     .addCell(Cell().add(commitmentsTable).setBorder(Border.NO_BORDER))
 
             innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("jobDescription", ""))).addCell(CellFactory.newSecondCell(workExperience.jobDescription))
 
             val technologiesTable = Table(1)
-            workExperience.technologies.forEach { technologiesTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it))) }
+            workExperience.technologies.forEach { technologiesTable.addCell(CellFactory.newCell().add(Paragraph(it)).setBold()) }
             innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("technologies", "")))
                     .addCell(Cell().add(technologiesTable).setBorder(Border.NO_BORDER))
 
