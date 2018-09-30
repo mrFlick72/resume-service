@@ -4,20 +4,23 @@ import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.borders.Border
+import com.itextpdf.layout.element.Cell
+import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeRepository
-import it.valeriovaudi.resume.resumeservice.domain.model.*
+import it.valeriovaudi.resume.resumeservice.domain.model.Education
+import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
+import it.valeriovaudi.resume.resumeservice.domain.model.Skill
+import it.valeriovaudi.resume.resumeservice.domain.model.WorkExperience
 import it.valeriovaudi.resume.resumeservice.domain.usecase.ResumePrinter
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
-import java.beans.Introspector
 import java.io.FileInputStream
 import java.io.InputStream
 import java.nio.file.Files
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
-import javax.swing.text.html.Option
 
 class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : ResumePrinter {
 
@@ -105,16 +108,31 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
 
     fun newWorkExperienceCells(table: Table, workExperience: List<WorkExperience>, label: Map<String, String>) {
         table.addCell(CellFactory.newSectionCell("Work Experiences")).addCell(CellFactory.newSecondCell(""))
-        workExperience.forEach { workExperience ->
-            table.addCell(CellFactory.newFirstCell("company")).addCell(CellFactory.newSecondCell(workExperience.company))
-            table.addCell(CellFactory.newFirstCell("startDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(workExperience.startDate)))
-            Optional.ofNullable(workExperience.endDate).ifPresent({ table.addCell(CellFactory.newFirstCell("endDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
-//            table.addCell(CellFactory.newFirstCell("commitments")).addCell(newListOfItemCell(workExperience.commitments))
-            table.addCell(CellFactory.newFirstCell("jobDescription")).addCell(CellFactory.newSecondCell(workExperience.jobDescription))
-//            table.addCell(CellFactory.newFirstCell("technologies")).addCell(CellFactory.newSecondCell(workExperience.technologies))
 
-            newEmptyCells(table)
+        val innerTable = Table(2)
+
+        workExperience.forEach { workExperience ->
+            innerTable.addCell(CellFactory.newSecondCell("company")).addCell(CellFactory.newSecondCell(workExperience.company))
+            innerTable.addCell(CellFactory.newSecondCell("startDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(workExperience.startDate)))
+            Optional.ofNullable(workExperience.endDate).ifPresent({ innerTable.addCell(CellFactory.newSecondCell("endDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+
+            val commitmentsTable = Table(1)
+            workExperience.commitments.forEach { commitmentsTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it)) )}
+            innerTable.addCell(CellFactory.newSecondCell("commitments"))
+                    .addCell(Cell().add(commitmentsTable).setBorder(Border.NO_BORDER))
+
+            innerTable.addCell(CellFactory.newSecondCell("jobDescription")).addCell(CellFactory.newSecondCell(workExperience.jobDescription))
+
+            val technologiesTable = Table(1)
+            workExperience.technologies.forEach { technologiesTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it)) )}
+            innerTable.addCell(CellFactory.newSecondCell("technologies"))
+                    .addCell(Cell().add(technologiesTable).setBorder(Border.NO_BORDER))
+
+
+            table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(""))
         }
+
+        table.addCell(CellFactory.newFirstCell("")).addCell(Cell().add(innerTable).setBorder(Border.NO_BORDER))
     }
 
     fun newEmptyCells(table: Table) {
