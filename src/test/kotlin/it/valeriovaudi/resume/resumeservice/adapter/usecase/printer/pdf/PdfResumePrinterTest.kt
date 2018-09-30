@@ -53,9 +53,12 @@ class PdfResumePrinterTest {
                 mongoEducationRepository,
                 mongoWorkExperienceRepository)
 
-        pdfResumePrinter = PdfResumePrinter(mongoResumeRepository)
+        pdfResumePrinter = PdfResumePrinter(mongoResumeRepository,
+                PersonalDetailsPdfSectionProducer(),
+                EducationsPdfSectionProducer(),
+                SkillsPdfSectionProducer(),
+                WorkExperiencePdfSectionProducer())
     }
-
 
     @Test
     fun `new resume as pdf`() {
