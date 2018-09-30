@@ -68,29 +68,29 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
         table.addCell(CellFactory.newSectionCell("Resume")).addCell(CellFactory.photoCell(personalDetails.photo.content))
         table.addCell(CellFactory.newSectionCell("Personal Details")).addCell(CellFactory.newSecondCell(""))
 
-        table.addCell(CellFactory.newFirstCell("firstName")).addCell(CellFactory.newSecondCell(personalDetails.firstName))
-        table.addCell(CellFactory.newFirstCell("lastName")).addCell(CellFactory.newSecondCell(personalDetails.lastName))
-        table.addCell(CellFactory.newFirstCell("address")).addCell(CellFactory.newSecondCell(personalDetails.address))
-        table.addCell(CellFactory.newFirstCell("zip")).addCell(CellFactory.newSecondCell(personalDetails.zip))
-        table.addCell(CellFactory.newFirstCell("city")).addCell(CellFactory.newSecondCell(personalDetails.city))
-        table.addCell(CellFactory.newFirstCell("region")).addCell(CellFactory.newSecondCell(personalDetails.region))
-        table.addCell(CellFactory.newFirstCell("mail")).addCell(CellFactory.newSecondCell(personalDetails.mail))
-        table.addCell(CellFactory.newFirstCell("mobile")).addCell(CellFactory.newSecondCell(personalDetails.mobile))
-        table.addCell(CellFactory.newFirstCell("birthDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(personalDetails.birthDate)))
-        table.addCell(CellFactory.newFirstCell("country")).addCell(CellFactory.newSecondCell(personalDetails.country))
-        table.addCell(CellFactory.newFirstCell("sex")).addCell(CellFactory.newSecondCell(personalDetails.sex.name))
-        table.addCell(CellFactory.newFirstCell("taxCode")).addCell(CellFactory.newSecondCell(personalDetails.taxCode))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("firstName", ""))).addCell(CellFactory.newSecondCell(personalDetails.firstName))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("lastName", ""))).addCell(CellFactory.newSecondCell(personalDetails.lastName))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("address", ""))).addCell(CellFactory.newSecondCell(personalDetails.address))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("zip", ""))).addCell(CellFactory.newSecondCell(personalDetails.zip))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("city", ""))).addCell(CellFactory.newSecondCell(personalDetails.city))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("region", ""))).addCell(CellFactory.newSecondCell(personalDetails.region))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("mail", ""))).addCell(CellFactory.newSecondCell(personalDetails.mail))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("mobile", ""))).addCell(CellFactory.newSecondCell(personalDetails.mobile))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("birthDate", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(personalDetails.birthDate)))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("country", ""))).addCell(CellFactory.newSecondCell(personalDetails.country))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("sex", ""))).addCell(CellFactory.newSecondCell(personalDetails.sex.name))
+        table.addCell(CellFactory.newFirstCell(label.getOrDefault("taxCode", ""))).addCell(CellFactory.newSecondCell(personalDetails.taxCode))
     }
 
     fun newEducationsCells(table: Table, educations: List<Education>, label: Map<String, String>) {
         table.addCell(CellFactory.newSectionCell("Educations")).addCell(CellFactory.newSecondCell(""))
 
         educations.forEach { education ->
-            Optional.ofNullable(education.company).ifPresent({ table.addCell(CellFactory.newFirstCell("company")).addCell(CellFactory.newSecondCell(it)) })
-            table.addCell(CellFactory.newFirstCell("title")).addCell(CellFactory.newSecondCell(education.title))
-            table.addCell(CellFactory.newFirstCell("type")).addCell(CellFactory.newSecondCell(education.type.name))
-            table.addCell(CellFactory.newFirstCell("dateFrom")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(education.dateFrom)))
-            Optional.ofNullable(education.dateTo).ifPresent({ table.addCell(CellFactory.newFirstCell("dateTo")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+            Optional.ofNullable(education.company).ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("company", ""))).addCell(CellFactory.newSecondCell(it)) })
+            table.addCell(CellFactory.newFirstCell(label.getOrDefault("title", ""))).addCell(CellFactory.newSecondCell(education.title))
+            table.addCell(CellFactory.newFirstCell(label.getOrDefault("type", ""))).addCell(CellFactory.newSecondCell(education.type.name))
+            table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateFrom", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(education.dateFrom)))
+            Optional.ofNullable(education.dateTo).ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateTo", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
             newEmptyCells(table)
         }
     }
@@ -112,20 +112,20 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository) : Re
         val innerTable = Table(2)
 
         workExperience.forEach { workExperience ->
-            innerTable.addCell(CellFactory.newSecondCell("company")).addCell(CellFactory.newSecondCell(workExperience.company))
-            innerTable.addCell(CellFactory.newSecondCell("startDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(workExperience.startDate)))
-            Optional.ofNullable(workExperience.endDate).ifPresent({ innerTable.addCell(CellFactory.newSecondCell("endDate")).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+            innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("company", ""))).addCell(CellFactory.newSecondCell(workExperience.company))
+            innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("startDate", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(workExperience.startDate)))
+            Optional.ofNullable(workExperience.endDate).ifPresent({ innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("endDate", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
 
             val commitmentsTable = Table(1)
-            workExperience.commitments.forEach { commitmentsTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it)) )}
-            innerTable.addCell(CellFactory.newSecondCell("commitments"))
+            workExperience.commitments.forEach { commitmentsTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it))) }
+            innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("commitments", "")))
                     .addCell(Cell().add(commitmentsTable).setBorder(Border.NO_BORDER))
 
-            innerTable.addCell(CellFactory.newSecondCell("jobDescription")).addCell(CellFactory.newSecondCell(workExperience.jobDescription))
+            innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("jobDescription", ""))).addCell(CellFactory.newSecondCell(workExperience.jobDescription))
 
             val technologiesTable = Table(1)
-            workExperience.technologies.forEach { technologiesTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it)) )}
-            innerTable.addCell(CellFactory.newSecondCell("technologies"))
+            workExperience.technologies.forEach { technologiesTable.addCell(Cell().setBorder(Border.NO_BORDER).add(Paragraph(it))) }
+            innerTable.addCell(CellFactory.newSecondCell(label.getOrDefault("technologies", "")))
                     .addCell(Cell().add(technologiesTable).setBorder(Border.NO_BORDER))
 
 
