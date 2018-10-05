@@ -3,7 +3,6 @@ package it.valeriovaudi.resume.resumeservice.adapter.repository
 import it.valeriovaudi.resume.resumeservice.domain.model.Education
 import it.valeriovaudi.resume.resumeservice.domain.repository.EducationRepository
 import org.bson.Document
-import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query

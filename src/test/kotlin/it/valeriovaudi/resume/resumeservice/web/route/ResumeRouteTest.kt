@@ -3,6 +3,7 @@ package it.valeriovaudi.resume.resumeservice.web.route
 import com.fasterxml.jackson.databind.ObjectMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.*
 import it.valeriovaudi.resume.resumeservice.domain.repository.ResumeRepository
+import it.valeriovaudi.resume.resumeservice.extractId
 import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
 import it.valeriovaudi.resume.resumeservice.web.representation.ResumeRepresentation
 import it.valeriovaudi.todolist.TestContextInitializer
@@ -44,8 +45,7 @@ class ResumeRouteTest {
                 .expectStatus().isCreated
                 .returnResult<Any>().responseHeaders.location
 
-        val locationChunck = location!!.toString().split("/")
-        val resumeId = locationChunck[locationChunck.size - 1];
+        val resumeId = location!!.extractId()
         Assert.assertNotNull(resumeRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1)))
     }
 
