@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
+import reactor.core.publisher.toMono
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -85,16 +86,39 @@ class EducationRouteTest {
         educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
 
 
-        val educationList  = this.webClient.get()
+        val educationList = this.webClient.get()
                 .uri("/resume/${resumeId}/education")
                 .exchange()
                 .expectStatus().isOk
-                .returnResult<Any>().responseBody
+                .returnResult<Education>().responseBody
                 .collectList().block(Duration.ofMinutes(1))
 
         println(educationList)
         Assert.assertNotNull(educationList)
         Assert.assertThat((educationList as MutableList).size, Is.`is`(3))
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    fun `find one education in a resume`() {
+        val resumeId = UUID.randomUUID().toString()
+        val id = UUID.randomUUID().toString()
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = id, title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+
+
+        val actualDducation = this.webClient.get()
+                .uri("/resume/${resumeId}/education/$id")
+                .exchange()
+                .expectStatus().isOk
+                .returnResult<Education>().responseBody
+                .toMono<Education>()
+                .block(Duration.ofMinutes(1))
+
+        println(actualDducation)
+        Assert.assertNotNull(actualDducation)
+        Assert.assertThat(actualDducation, Is.`is`(Education(id = id, title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))))
     }
 
 }

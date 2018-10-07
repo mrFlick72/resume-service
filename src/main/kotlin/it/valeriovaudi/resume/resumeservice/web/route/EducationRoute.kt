@@ -34,6 +34,12 @@ class EducationRoute {
                     .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
         }
 
+        GET("/resume/{resumeId}/education/{educationId}")
+        {
+            educationRepository.findOne(it.pathVariable("resumeId"), it.pathVariable("educationId")).toMono()
+                    .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
+        }
+
         PUT("/resume/{resumeId}/education/{educationId}")
         {
             val resumeId = it.pathVariable("resumeId")
