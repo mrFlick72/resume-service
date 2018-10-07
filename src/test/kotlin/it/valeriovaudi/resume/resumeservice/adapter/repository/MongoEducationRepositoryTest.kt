@@ -61,6 +61,39 @@ class MongoEducationRepositoryTest {
     }
 
     @Test
+    fun `findOne education items of a resume`() {
+        mongoEducationRepository = MongoEducationRepository(mongoTemplate)
+
+        val education1 = Education(id = "id1", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), dateTo = LocalDate.of(2018, 2, 1), type = EducationType.HING_SCOOL)
+        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCOOL)
+        val resumeId = UUID.randomUUID().toString()
+
+        mongoEducationRepository.save(resumeId, education1).toMono().block(Duration.ofMinutes(1))
+        mongoEducationRepository.save(resumeId, education2).toMono().block(Duration.ofMinutes(1))
+
+        val actualEducation = mongoEducationRepository.findOne(resumeId, "id1").toMono()
+                .block(Duration.ofMinutes(2))
+
+        Assert.assertNotNull(actualEducation)
+        Assert.assertThat(actualEducation, Is.`is`(education1))
+    }
+
+    @Test
+    fun `findOne education items not in resume`() {
+        mongoEducationRepository = MongoEducationRepository(mongoTemplate)
+
+        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCOOL)
+        val resumeId = UUID.randomUUID().toString()
+
+        mongoEducationRepository.save(resumeId, education2).toMono().block(Duration.ofMinutes(1))
+
+        val actualEducation = mongoEducationRepository.findOne(resumeId, "id1").toMono()
+                .block(Duration.ofMinutes(2))
+
+        Assert.assertNull(actualEducation)
+    }
+
+    @Test
     fun `delete an education title from a resume`() {
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
 

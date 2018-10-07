@@ -11,4 +11,5 @@ interface EducationRepository {
 
     fun delete(resumeId: String, educationId: String): Publisher<Unit>
 
+    fun findOne(resumeId: String, educationId: String): Publisher<Education>
 }

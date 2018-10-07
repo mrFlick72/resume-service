@@ -15,7 +15,7 @@ class EducationRoute {
 
     @Bean
     fun educationRoutes(@Value("\${baseServer:http://localhost:8080}") baseServer: String,
-                     educationRepository: EducationRepository) = router {
+                        educationRepository: EducationRepository) = router {
 
         POST("/resume/{resumeId}/education")
         {
@@ -25,6 +25,14 @@ class EducationRoute {
                     .flatMap { ServerResponse.created(URI("$baseServer/resume/$resumeId/education/${it.id}")).build() }
         }
 
+        PUT("/resume/{resumeId}/education/{educationId}")
+        {
+            val resumeId = it.pathVariable("resumeId")
+            val educationId = it.pathVariable("educationId")
+            it.bodyToMono(EducationRepresentation::class.java)
+                    .flatMap { educationRepository.save(resumeId, EducationRepresentation.fromRepresentationToDomain(it, educationId)).toMono() }
+                    .flatMap { ServerResponse.noContent().build() }
+        }
     }
 
 }

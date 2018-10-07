@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.query.isEqualTo
 import reactor.core.publisher.Mono
 
 class MongoEducationRepository(private val mongoTemplate: ReactiveMongoTemplate) : EducationRepository {
-
     companion object {
         fun collectionName() = "education"
         fun findOneQueryByResumeAndEducationId(resumeId: String, educationId: String) =
@@ -20,6 +19,11 @@ class MongoEducationRepository(private val mongoTemplate: ReactiveMongoTemplate)
         fun findOneQueryByResume(resumeId: String) = Query.query(Criteria.where("resumeId").isEqualTo(resumeId))
         fun findOneQuery(educationId: String) = Query.query(Criteria.where("_id").isEqualTo(educationId))
     }
+
+    override fun findOne(resumeId: String, educationId: String) =
+        mongoTemplate.findOne(findOneQueryByResumeAndEducationId(resumeId, educationId), Document::class.java, collectionName())
+                .map { EducationMapper.fromDocumentToDomain(it) }
+
 
     override fun findAll(resumeId: String) =
             mongoTemplate.find(findOneQueryByResume(resumeId), Document::class.java, collectionName())
