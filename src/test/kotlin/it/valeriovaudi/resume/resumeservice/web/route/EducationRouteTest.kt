@@ -74,4 +74,27 @@ class EducationRouteTest {
         Assert.assertNotNull(actualUpdatedEducation)
         Assert.assertThat(actualUpdatedEducation, Is.`is`(expectedEducation))
     }
+
+
+    @Test
+    @WithMockUser(username = "user")
+    fun `find all education in a resume`() {
+        val resumeId = UUID.randomUUID().toString()
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+
+
+        val educationList  = this.webClient.get()
+                .uri("/resume/${resumeId}/education")
+                .exchange()
+                .expectStatus().isOk
+                .returnResult<Any>().responseBody
+                .collectList().block(Duration.ofMinutes(1))
+
+        println(educationList)
+        Assert.assertNotNull(educationList)
+        Assert.assertThat((educationList as MutableList).size, Is.`is`(3))
+    }
+
 }

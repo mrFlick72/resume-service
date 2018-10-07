@@ -5,8 +5,10 @@ import it.valeriovaudi.resume.resumeservice.web.representation.EducationRepresen
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
+import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import java.net.URI
 
@@ -23,6 +25,13 @@ class EducationRoute {
             it.bodyToMono(EducationRepresentation::class.java)
                     .flatMap { educationRepository.save(resumeId, EducationRepresentation.fromRepresentationToDomain(it)).toMono() }
                     .flatMap { ServerResponse.created(URI("$baseServer/resume/$resumeId/education/${it.id}")).build() }
+        }
+
+        GET("/resume/{resumeId}/education")
+        {
+            educationRepository.findAll(it.pathVariable("resumeId")).toFlux()
+                    .collectList()
+                    .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
         }
 
         PUT("/resume/{resumeId}/education/{educationId}")
