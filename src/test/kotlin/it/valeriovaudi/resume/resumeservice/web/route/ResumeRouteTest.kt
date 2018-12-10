@@ -38,7 +38,7 @@ class ResumeRouteTest {
 
     @Test
     @WithMockUser(username = "user")
-    fun `save reume`() {
+    fun `save resume`() {
         val location = webClient.post()
                 .uri("/resume")
                 .exchange()
