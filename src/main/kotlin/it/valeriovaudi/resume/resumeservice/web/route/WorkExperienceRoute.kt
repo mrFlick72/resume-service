@@ -22,24 +22,27 @@ class WorkExperienceRoute {
             val resumeId = it.pathVariable("resumeId")
             it.bodyToMono(WorkExperienceRepresentation::class.java)
                     .flatMap { workExperienceRepository.save(resumeId, WorkExperienceRepresentation.fromRepresentationToDomain(it, resumeId)).toMono() }
-                    .flatMap { ServerResponse.created(URI("$baseServer/resume/$resumeId/education/${it.id}")).build() }
+                    .flatMap { ServerResponse.created(URI("$baseServer/resume/$resumeId/work-experience/${it.id}")).build() }
 
         }
 
-        GET("/resume/{resumeId}/education")
+        GET("/resume/{resumeId}/work-experience")
         {
             TODO()
         }
 
-        GET("/resume/{resumeId}/education/{educationId}")
+        GET("/resume/{resumeId}/work-experience/{educationId}")
         {
             TODO()
         }
 
-        PUT("/resume/{resumeId}/education/{educationId}")
+        PUT("/resume/{resumeId}/work-experience/{educationId}")
         {
-            TODO()
-        }
+            val resumeId = it.pathVariable("resumeId")
+            val educationId = it.pathVariable("educationId")
+            it.bodyToMono(WorkExperienceRepresentation::class.java)
+                    .flatMap { workExperienceRepository.save(resumeId, WorkExperienceRepresentation.fromRepresentationToDomain(it, educationId)).toMono() }
+                    .flatMap { ServerResponse.noContent().build() }        }
     }
 
 }

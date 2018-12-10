@@ -2,9 +2,11 @@ package it.valeriovaudi.resume.resumeservice.web.route
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoWorkExperienceRepository
+import it.valeriovaudi.resume.resumeservice.domain.model.WorkExperience
 import it.valeriovaudi.resume.resumeservice.extractId
 import it.valeriovaudi.resume.resumeservice.web.representation.WorkExperienceRepresentation
 import it.valeriovaudi.todolist.TestContextInitializer
+import org.hamcrest.core.Is
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
+import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
@@ -50,4 +53,24 @@ class WorkExperienceRouteTest {
         Assert.assertNotNull(location.extractId())
     }
 
+    @Test
+    fun `update a new work experience`() {
+        val workExperienceRepresentation = WorkExperienceRepresentation(startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))
+        val expectedWorkExperience = WorkExperience(id = "AN_ID", startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))
+
+        val workExperience = WorkExperience(id = "AN_ID", startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="", commitments = listOf())
+        val resumeId = UUID.randomUUID().toString()
+
+        workExperienceRepository.save(resumeId, workExperience).block(Duration.ofMinutes(1))
+
+        this.webClient.put()
+                .uri("/resume/${resumeId}/work-experience/AN_ID")
+                .body(BodyInserters.fromObject(workExperienceRepresentation))
+                .exchange()
+                .expectStatus().isNoContent
+
+        val actualUpdatedEducation = workExperienceRepository.findOne(resumeId, "AN_ID").block(Duration.ofMinutes(1))
+        Assert.assertNotNull(actualUpdatedEducation)
+        Assert.assertThat(actualUpdatedEducation, Is.`is`(expectedWorkExperience))
+    }
 }
