@@ -42,7 +42,8 @@ class WorkExperienceRoute {
             val educationId = it.pathVariable("educationId")
             it.bodyToMono(WorkExperienceRepresentation::class.java)
                     .flatMap { workExperienceRepository.save(resumeId, WorkExperienceRepresentation.fromRepresentationToDomain(it, educationId)).toMono() }
-                    .flatMap { ServerResponse.noContent().build() }        }
+                    .flatMap { ServerResponse.noContent().build() }
+        }
     }
 
 }
