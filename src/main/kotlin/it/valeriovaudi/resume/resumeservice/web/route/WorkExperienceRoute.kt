@@ -5,8 +5,10 @@ import it.valeriovaudi.resume.resumeservice.web.representation.WorkExperienceRep
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
+import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import java.net.URI
 
@@ -28,12 +30,15 @@ class WorkExperienceRoute {
 
         GET("/resume/{resumeId}/work-experience")
         {
-            TODO()
+            workExperienceRepository.findAll(it.pathVariable("resumeId")).toFlux()
+                    .collectList()
+                    .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
         }
 
-        GET("/resume/{resumeId}/work-experience/{educationId}")
+        GET("/resume/{resumeId}/work-experience/{workExperienceId}")
         {
-            TODO()
+            workExperienceRepository.findOne(it.pathVariable("resumeId"), it.pathVariable("workExperienceId")).toMono()
+                    .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
         }
 
         PUT("/resume/{resumeId}/work-experience/{educationId}")

@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
+import reactor.core.publisher.toMono
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -73,4 +74,46 @@ class WorkExperienceRouteTest {
         Assert.assertNotNull(actualUpdatedEducation)
         Assert.assertThat(actualUpdatedEducation, Is.`is`(expectedWorkExperience))
     }
+
+    @Test
+    @WithMockUser(username = "user")
+    fun `find all work experience in a resume`() {
+        val resumeId = UUID.randomUUID().toString()
+        workExperienceRepository.save(resumeId = resumeId, workExperience =  WorkExperience(id = UUID.randomUUID().toString(), startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))).block(Duration.ofMinutes(1))
+        workExperienceRepository.save(resumeId = resumeId, workExperience =  WorkExperience(id = UUID.randomUUID().toString(), startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))).block(Duration.ofMinutes(1))
+
+        val educationList = this.webClient.get()
+                .uri("/resume/${resumeId}/work-experience")
+                .exchange()
+                .expectStatus().isOk
+                .returnResult<WorkExperience>().responseBody
+                .collectList().block(Duration.ofMinutes(1))
+
+        println(educationList)
+        Assert.assertNotNull(educationList)
+        Assert.assertThat((educationList as MutableList).size, Is.`is`(2))
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    fun `find one education in a resume`() {
+        val anId = UUID.randomUUID().toString()
+        val resumeId = UUID.randomUUID().toString()
+        workExperienceRepository.save(resumeId = resumeId, workExperience =  WorkExperience(id = anId, startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))).block(Duration.ofMinutes(1))
+        workExperienceRepository.save(resumeId = resumeId, workExperience =  WorkExperience(id = UUID.randomUUID().toString(), startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))).block(Duration.ofMinutes(1))
+
+
+        val actualDducation = this.webClient.get()
+                .uri("/resume/${resumeId}/work-experience/$anId")
+                .exchange()
+                .expectStatus().isOk
+                .returnResult<WorkExperience>().responseBody
+                .toMono<WorkExperience>()
+                .block(Duration.ofMinutes(1))
+
+        println(actualDducation)
+        Assert.assertNotNull(actualDducation)
+        Assert.assertThat(actualDducation, Is.`is`(WorkExperience(id = anId, startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))))
+    }
+
 }
