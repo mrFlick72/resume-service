@@ -69,7 +69,8 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
             Mono.zip(mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName())
                     .switchIfEmpty(Mono.just(Document(mutableMapOf()))),
                     Mono.fromCallable { gridFsTemplate.getResource(resumeId) }
-                            .switchIfEmpty(Mono.just(GridFsResource(GridFSFile(BsonString(UUID.randomUUID().toString()), "", 0, 0, Date(), "", Document(), Document(mapOf("contentType" to PersonalDetailsPhoto.emptyPersonalDetailsPhoto().fileExtension)))))))
+                            .filter { it.exists()}
+                            .switchIfEmpty(Mono.just(GridFsResource(GridFSFile(BsonString("EMPTY"), "photo.jpeg", 0, 0, Date(), "", Document(), Document(mapOf("contentType" to PersonalDetailsPhoto.emptyPersonalDetailsPhoto().fileExtension)))))))
                     .map {
                         val personalData = it.t1
                         val resource = it.t2

@@ -59,6 +59,7 @@ class MongoSkillsRepositoryTest {
                         .toMono(),
                 mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY2", listOf("Skill_1_3", "Skill_2_3", "Skill_3_3"))))
                         .toMono())
+
                 .block(Duration.ofMinutes(1))
 
         mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_1", "Skill_2", "Skill_3")),

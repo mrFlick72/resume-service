@@ -148,7 +148,7 @@ class MongoPersonalDetailsRepositoryTest {
 
         println("photo")
         Assert.assertNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
-        Assert.assertNull(gridFsTemplate.getResource(resumeId))
+        Assert.assertFalse(gridFsTemplate.getResource(resumeId).exists())
 
     }
 }
