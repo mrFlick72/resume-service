@@ -15,4 +15,4 @@ fun main(args: Array<String>) {
     }
 }
 
-fun Document.getStringOrDefault(key: String, defaultValue: String? = "") = Optional.ofNullable(this.getString(key)).orElse(defaultValue);
+fun Document.getStringOrDefault(key: String, defaultValue: String? = "") = Optional.ofNullable(this.getString(key)).orElse(defaultValue)
