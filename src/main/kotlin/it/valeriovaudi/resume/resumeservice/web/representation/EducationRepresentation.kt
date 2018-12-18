@@ -16,6 +16,7 @@ data class EducationRepresentation(var company: String? = null,
                         type = educationRepresentation.type, company = educationRepresentation.company,
                         dateFrom = educationRepresentation.dateFrom, dateTo = educationRepresentation.dateTo)
 
+        @Deprecated("not used and probably useles")
         fun fromDomainToRepresentation(education: Education) =
                 EducationRepresentation(title = education.title,
                         type = education.type, company = education.company,
