@@ -11,5 +11,6 @@ object RepositoryConfig {
         bean<MongoResumeRepository>()
         bean<MongoWorkExperienceRepository>()
         bean<MongoEducationRepository>()
+        bean<MongoLanguageSkillsRepository>()
     }
 }
