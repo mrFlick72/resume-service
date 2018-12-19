@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.junit4.SpringRunner
-import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 import java.time.Duration
@@ -51,7 +50,7 @@ class MongoSkillsRepositoryTest {
         val mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
 
         val resumeId = UUID.randomUUID().toString()
-        Mono.zip(mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_1", "Skill_2", "Skill_3"))))
+        /*Mono.zip(mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_1", "Skill_2", "Skill_3"))))
                 .toMono(),
                 mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_2", "Skill_2_2", "Skill_3_2"))))
                         .toMono(),
@@ -61,7 +60,7 @@ class MongoSkillsRepositoryTest {
                         .toMono())
 
                 .block(Duration.ofMinutes(1))
-
+*/
         mongoSkillsRepository.save(resumeId, listOf(Skill("A_FAMILY", listOf("Skill_1_1", "Skill_2", "Skill_3")),
                 Skill("A_FAMILY", listOf("Skill_1_2", "Skill_2_2", "Skill_3_2")),
                 Skill("A_FAMILY", listOf("Skill_1_3", "Skill_2_3", "Skill_3_3")),
