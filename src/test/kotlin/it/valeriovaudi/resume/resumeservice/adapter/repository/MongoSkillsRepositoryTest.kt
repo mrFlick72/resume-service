@@ -69,12 +69,12 @@ class MongoSkillsRepositoryTest {
                 .block(Duration.ofMinutes(1))
 
 
-        val acutal = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)), Document::class.java, "skill")
+        val actual = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)), Document::class.java, "skill")
                 .collectList().block(Duration.ofMinutes(1))
-        println(acutal)
+        println(actual)
 
-        assertThat((acutal as List<Document>).size, Is.`is`(2))
-        assertNotNull(acutal)
+        assertThat((actual as List<Document>).size, Is.`is`(2))
+        assertNotNull(actual)
     }
 
     @Test
