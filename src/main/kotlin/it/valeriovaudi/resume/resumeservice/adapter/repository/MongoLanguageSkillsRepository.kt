@@ -19,9 +19,9 @@ class MongoLanguageSkillsRepository(private val mongoTemplate: ReactiveMongoTemp
     }
 
     override fun findOne(resumeId: String): Publisher<LanguageSkills> =
-        mongoTemplate.find(MongoSkillsRepository.findOneQuery(resumeId = resumeId), Document::class.java, MongoLanguageSkillsRepository.collectionName())
-                .map { LanguageSkillsMapper.fromDocumentToDomain(it) }
-                .onErrorResume { println("Error at ${it}"); Mono.just(LanguageSkills("", listOf()))}
+            mongoTemplate.find(MongoSkillsRepository.findOneQuery(resumeId = resumeId), Document::class.java, MongoLanguageSkillsRepository.collectionName())
+                    .map { LanguageSkillsMapper.fromDocumentToDomain(it) }
+                    .onErrorResume { println("Error at ${it}"); Mono.just(LanguageSkills("", listOf())) }
 
 
     override fun save(resumeId: String, languageSkills: LanguageSkills): Mono<LanguageSkills> =
@@ -29,7 +29,7 @@ class MongoLanguageSkillsRepository(private val mongoTemplate: ReactiveMongoTemp
                     Update.fromDocument(LanguageSkillsMapper.fromDomainToDocument(resumeId, languageSkills)), MongoLanguageSkillsRepository.collectionName())
                     .flatMap { Mono.just(languageSkills) }
 
-    override fun delete(resumeId: String): Publisher<Unit> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun delete(resumeId: String): Publisher<Unit> =
+            mongoTemplate.remove(MongoLanguageSkillsRepository.findOneQueryByResume(resumeId), MongoLanguageSkillsRepository.collectionName())
+                    .flatMap { Mono.just(Unit) }
 }

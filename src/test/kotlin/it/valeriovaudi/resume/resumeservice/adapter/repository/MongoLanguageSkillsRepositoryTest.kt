@@ -55,4 +55,23 @@ class MongoLanguageSkillsRepositoryTest {
         val actual = mongoLanguageSkillsRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1))
         Assert.assertThat(expected, Is.`is`(actual))
     }
+
+    @Test
+    fun `delete language skills details`() {
+        mongoLanguageSkillsRepository = MongoLanguageSkillsRepository(mongoTemplate)
+        val resumeId = UUID.randomUUID().toString()
+        val expected = mongoLanguageSkillsRepository.save(resumeId, LanguageSkills("A_NATIVE_LANGUAGE",
+                listOf(LanguageSkill("A_LANGUAGE",
+                        Understanding(LanguageCapabilityLevel.B1, LanguageCapabilityLevel.B1),
+                        Speaking(LanguageCapabilityLevel.B1, LanguageCapabilityLevel.B1), LanguageCapabilityLevel.B1))))
+                .toMono().block(Duration.ofMinutes(1))
+
+        var actual = mongoLanguageSkillsRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1))
+        Assert.assertThat(expected, Is.`is`(actual))
+
+        mongoLanguageSkillsRepository.delete(resumeId).toMono().block(Duration.ofMinutes(1))
+
+        actual = mongoLanguageSkillsRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1))
+        Assert.assertNull(actual)
+    }
 }
