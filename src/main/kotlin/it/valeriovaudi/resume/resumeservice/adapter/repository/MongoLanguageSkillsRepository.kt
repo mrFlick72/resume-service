@@ -17,7 +17,6 @@ class MongoLanguageSkillsRepository(private val mongoTemplate: ReactiveMongoTemp
                 Query.query(Criteria.where("resumeId").isEqualTo(resumeId).and("_id").isEqualTo(languageSkillsId))
 
         fun findOneQueryByResume(resumeId: String) = Query.query(Criteria.where("resumeId").isEqualTo(resumeId))
-        fun findOneQuery(languageSkillsId: String) = Query.query(Criteria.where("_id").isEqualTo(languageSkillsId))
     }
 
     override fun findOne(resumeId: String): Publisher<LanguageSkills> {
@@ -25,7 +24,7 @@ class MongoLanguageSkillsRepository(private val mongoTemplate: ReactiveMongoTemp
     }
 
     override fun save(resumeId: String, languageSkills: LanguageSkills): Mono<LanguageSkills> =
-            mongoTemplate.upsert(MongoLanguageSkillsRepository.findOneQuery(resumeId),
+            mongoTemplate.upsert(MongoLanguageSkillsRepository.findOneQueryByResume(resumeId),
                     Update.fromDocument(LanguageSkillsMapper.fromDomainToDocument(resumeId, languageSkills)), MongoLanguageSkillsRepository.collectionName())
                     .flatMap { Mono.just(languageSkills) }
 
