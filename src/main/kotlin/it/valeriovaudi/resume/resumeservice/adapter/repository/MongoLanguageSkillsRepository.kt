@@ -1,5 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
+import it.valeriovaudi.resume.resumeservice.adapter.repository.mapper.LanguageSkillsMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
 import it.valeriovaudi.resume.resumeservice.domain.repository.LanguageSkillsRepository
 import org.bson.Document
