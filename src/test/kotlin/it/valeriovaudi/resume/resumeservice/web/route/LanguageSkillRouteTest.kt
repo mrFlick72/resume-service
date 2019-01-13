@@ -1,9 +1,14 @@
 package it.valeriovaudi.resume.resumeservice.web.route
 
-import it.valeriovaudi.resume.resumeservice.TestCase
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoLanguageSkillsRepository
+import it.valeriovaudi.resume.resumeservice.domain.model.LanguageCapabilityLevel.*
+import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkill
+import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
+import it.valeriovaudi.resume.resumeservice.domain.model.Speaking
+import it.valeriovaudi.resume.resumeservice.domain.model.Understanding
 import it.valeriovaudi.todolist.TestContextInitializer
-import org.junit.Assert.*
+import org.hamcrest.core.Is
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +18,9 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
+import java.net.URI
 import java.util.*
 
 @ContextConfiguration(initializers = [TestContextInitializer::class])
@@ -31,15 +38,22 @@ class LanguageSkillRouteTest {
     @Test
     @WithMockUser(username = "user")
     fun `save language skill`() {
-        val expectedJson = TestCase.readFileAsString("personal-details.json")
-        val resumeId = UUID.randomUUID().toString();
-        webClient.put()
+        val resumeId = UUID.randomUUID().toString()
+        val languageSkills = LanguageSkills("A_NATIVE_LANGUAGE",
+                listOf(LanguageSkill("A_LANGUAGE",
+                        Understanding(B1, C1),
+                        Speaking(A1, C1), C1)))
+        val location =  webClient.post()
                 .uri("/resume/${resumeId}/language-skill")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(TestCase.personalDetails()))
+                .body(BodyInserters.fromObject(languageSkills))
                 .exchange()
-                .expectStatus().isOk
-                .expectBody().json(expectedJson)
+                .expectStatus().isCreated
+                .returnResult<Any>().responseHeaders.location
+
+        Assert.assertNotNull(location)
+        Assert.assertThat(URI("http://localhost:8080/resume/$resumeId/language-skill") , Is.`is`(location))
+
     }
 
     @Test
