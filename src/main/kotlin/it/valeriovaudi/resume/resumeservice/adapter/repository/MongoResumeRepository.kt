@@ -1,6 +1,7 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import com.mongodb.client.result.UpdateResult
+import it.valeriovaudi.resume.resumeservice.adapter.repository.mapper.ResumeMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.*
 import it.valeriovaudi.resume.resumeservice.domain.repository.ResumeRepository
 import org.bson.Document
