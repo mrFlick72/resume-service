@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.toMono
 
-
 @Configuration
 class LanguageSkillRoute {
 
@@ -29,6 +28,12 @@ class LanguageSkillRoute {
             val resumeId = it.pathVariable("resumeId")
             it.bodyToMono(LanguageSkills::class.java)
                     .flatMap { languageSkillsRepository.save(resumeId, it).toMono() }
+                    .flatMap { ServerResponse.noContent().build() }
+        }
+
+        DELETE("/resume/{resumeId}/language-skills") {
+            val resumeId = it.pathVariable("resumeId")
+            languageSkillsRepository.delete(resumeId).toMono()
                     .flatMap { ServerResponse.noContent().build() }
         }
     }

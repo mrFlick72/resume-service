@@ -8,6 +8,7 @@ import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
 import it.valeriovaudi.resume.resumeservice.domain.model.Speaking
 import it.valeriovaudi.resume.resumeservice.domain.model.Understanding
 import it.valeriovaudi.todolist.TestContextInitializer
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -56,7 +57,6 @@ class LanguageSkillRouteTest {
     @WithMockUser(username = "user")
     fun `read language skill`() {
         val resumeId = UUID.randomUUID().toString()
-
         languageSkillsRepository.save("$resumeId", languageSkills).toMono().block(Duration.ofMinutes(1));
 
         val expectedJson = TestCase.readFileAsString("language-skills.json")
@@ -71,14 +71,14 @@ class LanguageSkillRouteTest {
     @Test
     @WithMockUser(username = "user")
     fun `delete language skill`() {
-//        personalDetailsRepository.save("RESUME_ID", TestCase.personalDetails()).toMono().block();
-//
-//        webClient.delete()
-//                .uri("/resume/RESUME_ID/personal-details")
-//                .exchange()
-//                .expectStatus().isNoContent
-//
-//
-//        Assert.assertTrue(personalDetailsRepository.findOne("RESUME_ID").toMono().block()!!.isEmpty())
+        val resumeId = UUID.randomUUID().toString()
+        languageSkillsRepository.save("$resumeId", languageSkills).toMono().block(Duration.ofMinutes(1));
+
+        webClient.delete()
+                .uri("/resume/$resumeId/language-skills")
+                .exchange()
+                .expectStatus().isNoContent
+
+        Assert.assertNull(languageSkillsRepository.findOne("$resumeId").toMono().block(Duration.ofMinutes(1)))
     }
 }
