@@ -1,0 +1,17 @@
+{
+  "nativeLanguage": "A_NATIVE_LANGUAGE",
+  "otherLanguages": [
+    {
+      "language": "A_LANGUAGE",
+      "understanding": {
+        "listening": "B1",
+        "reading": "C1"
+      },
+      "speaking": {
+        "interaction": "A1",
+        "production": "C1"
+      },
+      "writing": "C1"
+    }
+  ]
+}
