@@ -1,9 +1,9 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
+import it.valeriovaudi.resume.resumeservice.adapter.repository.mapper.WorkExperienceMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.WorkExperience
 import it.valeriovaudi.resume.resumeservice.domain.repository.WorkExperienceRepository
 import org.bson.Document
-import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query

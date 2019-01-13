@@ -1,6 +1,6 @@
-package it.valeriovaudi.resume.resumeservice.adapter.repository
+package it.valeriovaudi.resume.resumeservice.adapter.repository.mapper
 
-import it.valeriovaudi.resume.resumeservice.domain.model.*
+import it.valeriovaudi.resume.resumeservice.domain.model.WorkExperience
 import it.valeriovaudi.resume.resumeservice.getStringOrDefault
 import org.bson.Document
 import java.time.LocalDate
@@ -16,7 +16,7 @@ object WorkExperienceMapper {
                     "company" to workExperience.company,
                     "jobDescription" to workExperience.jobDescription,
                     "startDate" to dateFormatter.format(workExperience.startDate),
-                    "endDate" to Optional.ofNullable(workExperience.endDate).map { dateFormatter.format(it) }.orElse(""),
+                    "endDate" to Optional.ofNullable(workExperience.endDate).map { WorkExperienceMapper.dateFormatter.format(it) }.orElse(""),
                     "commitments" to workExperience.commitments,
                     "technologies" to workExperience.technologies) as Map<String, Any>?)
 
