@@ -1,4 +1,4 @@
-package it.valeriovaudi.resume.resumeservice.adapter.repository
+package it.valeriovaudi.resume.resumeservice.adapter.repository.mapper
 
 import it.valeriovaudi.resume.resumeservice.domain.model.Education
 import it.valeriovaudi.resume.resumeservice.domain.model.EducationType
@@ -18,7 +18,7 @@ object EducationMapper {
                     "title" to education.title,
                     "type" to education.type.name,
                     "dateFrom" to dateFormatter.format(education.dateFrom),
-                    "dateTo" to Optional.ofNullable(education.dateTo).map { dateFormatter.format(it) }.orElse("")) as Map<String, Any>?)
+                    "dateTo" to Optional.ofNullable(education.dateTo).map { EducationMapper.dateFormatter.format(it) }.orElse("")) as Map<String, Any>?)
 
 
     fun fromDocumentToDomain(document: Document) =
