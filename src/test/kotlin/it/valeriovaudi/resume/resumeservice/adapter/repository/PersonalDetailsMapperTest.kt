@@ -1,9 +1,8 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import org.junit.Assert.*
+import it.valeriovaudi.resume.resumeservice.adapter.repository.mapper.PersonalDetailsMapper
 import org.junit.Test
 import java.time.LocalDate
-import java.util.*
 
 class PersonalDetailsMapperTest{
 

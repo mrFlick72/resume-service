@@ -1,4 +1,4 @@
-package it.valeriovaudi.resume.resumeservice.adapter.repository
+package it.valeriovaudi.resume.resumeservice.adapter.repository.mapper
 
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
@@ -23,7 +23,7 @@ object PersonalDetailsMapper {
                     "region" to personalDetails.region,
                     "mail" to personalDetails.mail,
                     "mobile" to personalDetails.mobile,
-                    "birthDate" to Optional.ofNullable(personalDetails.birthDate).map { dateFormatter.format(it) }.orElse(""),
+                    "birthDate" to Optional.ofNullable(personalDetails.birthDate).map { PersonalDetailsMapper.dateFormatter.format(it) }.orElse(""),
                     "country" to personalDetails.country,
                     "sex" to personalDetails.sex.name,
                     "taxCode" to personalDetails.taxCode) as Map<String, Any>?)

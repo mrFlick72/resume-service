@@ -2,6 +2,7 @@ package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import com.mongodb.client.gridfs.model.GridFSFile
 import com.mongodb.client.result.UpdateResult
+import it.valeriovaudi.resume.resumeservice.adapter.repository.mapper.PersonalDetailsMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
