@@ -1,11 +1,12 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import it.valeriovaudi.resume.resumeservice.domain.model.LanguageCapabilityLevel.A1
+import it.valeriovaudi.resume.resumeservice.domain.model.LanguageCapabilityLevel.*
 import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkill
 import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
 import it.valeriovaudi.resume.resumeservice.domain.model.Speaking
 import it.valeriovaudi.resume.resumeservice.domain.model.Understanding
 import org.bson.Document
+import org.hamcrest.core.Is
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,8 +40,30 @@ class MongoLanguageSkillsRepositoryTest {
                 .toMono().block(Duration.ofMinutes(1))
 
 
+        val document = mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)), Document::class.java, "languageSkill")
+                .block(Duration.ofMinutes(1))
         Assert.assertNotNull(save)
-        Assert.assertNotNull(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)), Document::class.java, "languageSkill")
-                .block(Duration.ofMinutes(1)))
+        Assert.assertNotNull(document)
+
+        println(document)
+    }
+
+    @Test
+    fun `find one language skill set`() {
+        val expected = LanguageSkills("A_NATIVE_LANGUAGE",
+                listOf(LanguageSkill("A_LANGUAGE",
+                        Understanding(B1, C1),
+                        Speaking(A1, C1), C1)))
+
+        mongoLanguageSkillsRepository = MongoLanguageSkillsRepository(mongoTemplate)
+        val resumeId = UUID.randomUUID().toString()
+        mongoLanguageSkillsRepository.save(resumeId, expected)
+                .toMono().block(Duration.ofMinutes(1))
+
+
+        val actual = mongoLanguageSkillsRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1))
+
+        Assert.assertNotNull(actual)
+        Assert.assertThat(actual, Is.`is`(expected))
     }
 }
