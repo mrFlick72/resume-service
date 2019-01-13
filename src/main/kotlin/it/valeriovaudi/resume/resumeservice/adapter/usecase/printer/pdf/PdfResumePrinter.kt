@@ -45,7 +45,7 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository,
         }
     }
 
-    fun makePdf(resumeId: String, document: Document): Unit? {
+    private fun makePdf(resumeId: String, document: Document): Unit? {
         return this.resumeRepository.findOne(resumeId).toMono()
                 .flatMap {
                     document.setFontSize(14f)

@@ -1,7 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import it.valeriovaudi.resume.resumeservice.domain.model.*
-import it.valeriovaudi.resume.resumeservice.getStringOrDefault
+import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
 import org.bson.Document
 import java.util.*
 
