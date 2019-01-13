@@ -1,11 +1,12 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import it.valeriovaudi.resume.resumeservice.domain.model.LanguageCapabilityLevel.A1
+import it.valeriovaudi.resume.resumeservice.domain.model.LanguageCapabilityLevel.*
 import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkill
 import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
 import it.valeriovaudi.resume.resumeservice.domain.model.Speaking
 import it.valeriovaudi.resume.resumeservice.domain.model.Understanding
 import org.bson.Document
+import org.hamcrest.core.Is
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,8 +73,8 @@ class MongoLanguageSkillsRepositoryTest {
         val resumeId = UUID.randomUUID().toString()
         val expected = mongoLanguageSkillsRepository.save(resumeId, LanguageSkills("A_NATIVE_LANGUAGE",
                 listOf(LanguageSkill("A_LANGUAGE",
-                        Understanding(LanguageCapabilityLevel.B1, LanguageCapabilityLevel.B1),
-                        Speaking(LanguageCapabilityLevel.B1, LanguageCapabilityLevel.B1), LanguageCapabilityLevel.B1))))
+                        Understanding(B1, B1),
+                        Speaking(B1, B1), B1))))
                 .toMono().block(Duration.ofMinutes(1))
 
         val actual = mongoLanguageSkillsRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1))
@@ -86,8 +87,8 @@ class MongoLanguageSkillsRepositoryTest {
         val resumeId = UUID.randomUUID().toString()
         val expected = mongoLanguageSkillsRepository.save(resumeId, LanguageSkills("A_NATIVE_LANGUAGE",
                 listOf(LanguageSkill("A_LANGUAGE",
-                        Understanding(LanguageCapabilityLevel.B1, LanguageCapabilityLevel.B1),
-                        Speaking(LanguageCapabilityLevel.B1, LanguageCapabilityLevel.B1), LanguageCapabilityLevel.B1))))
+                        Understanding(B1, B1),
+                        Speaking(B1, B1), B1))))
                 .toMono().block(Duration.ofMinutes(1))
 
         var actual = mongoLanguageSkillsRepository.findOne(resumeId).toMono().block(Duration.ofMinutes(1))

@@ -1,6 +1,7 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
-import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
+import it.valeriovaudi.resume.resumeservice.domain.model.*
+import it.valeriovaudi.resume.resumeservice.getStringOrDefault
 import org.bson.Document
 import java.util.*
 
@@ -45,5 +46,4 @@ private fun extractSpeaking(document: Document) =
                     Speaking(interaction = it.getLanguageCapabilityLevelOrDefault("interaction"), production = it.getLanguageCapabilityLevelOrDefault("production"))
                 }
 
-private fun extractWriting(document: Document) =
-        (document.getString("writing")).let { it.getLanguageCapabilityLevelOrDefault() }
+private fun extractWriting(document: Document) = (document.getString("writing")).getLanguageCapabilityLevelOrDefault()

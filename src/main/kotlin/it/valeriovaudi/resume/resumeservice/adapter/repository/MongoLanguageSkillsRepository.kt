@@ -2,6 +2,7 @@ package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import it.valeriovaudi.resume.resumeservice.domain.model.LanguageSkills
 import it.valeriovaudi.resume.resumeservice.domain.repository.LanguageSkillsRepository
+import org.bson.Document
 import org.reactivestreams.Publisher
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
