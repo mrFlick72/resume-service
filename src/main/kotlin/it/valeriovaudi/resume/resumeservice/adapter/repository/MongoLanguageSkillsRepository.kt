@@ -19,17 +19,17 @@ class MongoLanguageSkillsRepository(private val mongoTemplate: ReactiveMongoTemp
     }
 
     override fun findOne(resumeId: String): Publisher<LanguageSkills> =
-            mongoTemplate.find(MongoSkillsRepository.findOneQuery(resumeId = resumeId), Document::class.java, MongoLanguageSkillsRepository.collectionName())
+            mongoTemplate.find(MongoSkillsRepository.findOneQuery(resumeId = resumeId), Document::class.java, collectionName())
                     .map { LanguageSkillsMapper.fromDocumentToDomain(it) }
                     .onErrorResume { println("Error at ${it}"); Mono.just(LanguageSkills("", listOf())) }
 
 
     override fun save(resumeId: String, languageSkills: LanguageSkills): Mono<LanguageSkills> =
-            mongoTemplate.upsert(MongoLanguageSkillsRepository.findOneQueryByResume(resumeId),
-                    Update.fromDocument(LanguageSkillsMapper.fromDomainToDocument(resumeId, languageSkills)), MongoLanguageSkillsRepository.collectionName())
+            mongoTemplate.upsert(findOneQueryByResume(resumeId),
+                    Update.fromDocument(LanguageSkillsMapper.fromDomainToDocument(resumeId, languageSkills)), collectionName())
                     .flatMap { Mono.just(languageSkills) }
 
     override fun delete(resumeId: String): Publisher<Unit> =
-            mongoTemplate.remove(MongoLanguageSkillsRepository.findOneQueryByResume(resumeId), MongoLanguageSkillsRepository.collectionName())
+            mongoTemplate.remove(findOneQueryByResume(resumeId), collectionName())
                     .flatMap { Mono.just(Unit) }
 }
