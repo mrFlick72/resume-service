@@ -1,6 +1,6 @@
 spring:
   application:
-    name: resume-servcie
+    name: resume-service
   data:
     mongodb:
       database: resume

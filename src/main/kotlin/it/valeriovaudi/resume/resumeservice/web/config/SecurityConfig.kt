@@ -19,13 +19,11 @@ class SecurityConfig {
 
     @Bean
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-        http.csrf().disable()
+        return http.csrf().disable()
                 .authorizeExchange()
                 .anyExchange().permitAll()
                 .and()
-                .httpBasic().and()
-                .formLogin();
-        return http.build();
+                .build();
     }
 
     @Bean
