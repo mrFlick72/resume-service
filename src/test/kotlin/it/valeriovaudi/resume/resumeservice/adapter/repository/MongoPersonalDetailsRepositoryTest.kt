@@ -9,6 +9,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query.query
@@ -16,6 +17,7 @@ import org.springframework.data.mongodb.gridfs.GridFsOperations
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.test.context.junit4.SpringRunner
 import reactor.core.publisher.toMono
+import software.amazon.awssdk.services.s3.S3AsyncClient
 import java.time.Duration
 import java.util.*
 
@@ -30,12 +32,12 @@ class MongoPersonalDetailsRepositoryTest {
 
     lateinit var mongoPersonalDetailsRepository: MongoPersonalDetailsRepository
 
-    @Autowired
-    var gridFsOperations: GridFsOperations? = null
+    @MockBean
+    lateinit var s3AsyncClient : S3AsyncClient
 
     @Before
     fun setUp() {
-        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)
+        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate,"",s3AsyncClient)
     }
 
     @Test
@@ -49,13 +51,13 @@ class MongoPersonalDetailsRepositoryTest {
                     Assert.assertThat(it, `is`(personalDetails))
                 }
 
+
         println("details")
         Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
-        Assert.assertNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
     }
 
     @Test
@@ -74,8 +76,6 @@ class MongoPersonalDetailsRepositoryTest {
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
-        Assert.assertNotNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
-        Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
     }
 
     @Test
@@ -145,8 +145,5 @@ class MongoPersonalDetailsRepositoryTest {
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
-        Assert.assertNull(gridFsTemplate.findOne(query(Criteria.where("metadata.resumeId").`is`(resumeId))))
-        Assert.assertFalse(gridFsTemplate.getResource(resumeId).exists())
-
     }
 }

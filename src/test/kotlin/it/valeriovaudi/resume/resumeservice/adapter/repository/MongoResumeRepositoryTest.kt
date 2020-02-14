@@ -10,6 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -17,6 +18,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.test.context.junit4.SpringRunner
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
+import software.amazon.awssdk.services.s3.S3AsyncClient
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -40,13 +42,15 @@ class MongoResumeRepositoryTest {
     lateinit var mongoEducationRepository: MongoEducationRepository
 
     lateinit var mongoWorkExperienceRepository: MongoWorkExperienceRepository
+    @MockBean
+    lateinit var s3AsyncClient : S3AsyncClient
 
     @Before
     fun setUp() {
         mongoWorkExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
         mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
-        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, gridFsTemplate)
+        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, "",s3AsyncClient)
         mongoResumeRepository = MongoResumeRepository(mongoTemplate,
                 mongoPersonalDetailsRepository,
                 mongoSkillsRepository,
