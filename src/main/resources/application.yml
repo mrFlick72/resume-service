@@ -7,4 +7,7 @@ spring:
 
 management.endpoints.web.exposure.include: "*"
 
-baseServer: http://localhost:8080
+server:
+  port: 8081
+
+baseServer: http://localhost:8081

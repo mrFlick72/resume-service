@@ -27,8 +27,6 @@ class MongoPersonalDetailsRepositoryTest {
     @Autowired
     lateinit var mongoTemplate: ReactiveMongoTemplate
 
-    @Autowired
-    lateinit var gridFsTemplate: GridFsTemplate
 
     lateinit var mongoPersonalDetailsRepository: MongoPersonalDetailsRepository
 
