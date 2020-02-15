@@ -4,6 +4,7 @@ import com.mongodb.client.result.UpdateResult
 import it.valeriovaudi.resume.resumeservice.adapter.repository.mapper.PersonalDetailsMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
+import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto.Companion.emptyPersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.repository.PersonalDetailsRepository
 import org.bson.Document
 import org.reactivestreams.Publisher
@@ -14,18 +15,22 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
 import reactor.core.publisher.Mono
+import reactor.util.function.Tuple2
 import software.amazon.awssdk.core.ResponseBytes
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.core.async.AsyncResponseTransformer
 import software.amazon.awssdk.services.s3.S3AsyncClient
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
-import software.amazon.awssdk.services.s3.model.GetObjectResponse
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.*
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
                                      @Value("\${aws.s3.bucket}") private val awsBucket: String,
                                      private val s3Client: S3AsyncClient) : PersonalDetailsRepository {
+
+    private var photoRepository: S3PhotoRepository
+
+    init {
+        photoRepository = S3PhotoRepository(awsBucket, s3Client)
+    }
 
     companion object {
         fun collectionName() = "personalDetails"
@@ -35,7 +40,7 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
     override fun delete(resumeId: String) =
             Mono.zip(
                     mongoTemplate.remove(findOneQuery(resumeId), collectionName()),
-                    deletePhoto(resumeId)
+                    photoRepository.deletePhoto(resumeId)
             ).flatMap { Mono.just(Unit) }
 
     override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
@@ -44,18 +49,12 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                         Update.fromDocument(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails)), collectionName())
                         .onErrorResume { println("Error at ${it}"); Mono.just(UpdateResult.unacknowledged()) }
 
-        val photoData =
-                if (personalDetails.photo.content.isNotEmpty())
-                    personalDetails.photo.content.let {
-                        loadPhoto(resumeId, it)
-                    }
-                else Mono.just("");
+        val photoData = photoRepository.loadPhoto(resumeId, personalDetails.photo)
 
         return Mono.zip(personalDetailsMono, photoData)
                 .map { personalDetails }
                 .onErrorReturn(PersonalDetails.emptyPersonalDetails())
     }
-
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =
             findResumeBy(resumeId)
@@ -64,41 +63,61 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
 
     override fun findOne(resumeId: String): Publisher<PersonalDetails> =
             Mono.zip(findResumeBy(resumeId),
-                    getPhoto(resumeId))
-                    .map {
-                        val personalData = it.t1
-                        val resource = it.t2
+                    photoRepository.getPhoto(resumeId))
+                    .map { makePersonalDetails(it) }
 
-                        val photo = if (resource.asByteArray().size != 0)
-                            PersonalDetailsPhoto(content = resource.asByteArray(),
-                                    fileExtension = resource.response().contentType())
-                        else PersonalDetailsPhoto.emptyPersonalDetailsPhoto()
-
-                        PersonalDetailsMapper.fromDocumentToDomain(document = personalData, photo = photo)
-                    }
+    private fun makePersonalDetails(it: Tuple2<Document, PersonalDetailsPhoto>): PersonalDetails =
+            PersonalDetailsMapper.fromDocumentToDomain(document = it.t1, photo = it.t2)
 
     private fun findResumeBy(resumeId: String) =
             mongoTemplate.findOne(findOneQuery(resumeId), Document::class.java, collectionName())
                     .switchIfEmpty(Mono.just(Document(mutableMapOf())))
 
+}
 
-    private fun deletePhoto(resumeId: String) =
-            Mono.fromCompletionStage { s3Client.deleteObject(DeleteObjectRequest.builder().bucket(this.awsBucket).key(resumeId).build()) }
+internal class S3PhotoRepository(@Value("\${aws.s3.bucket}") private val awsBucket: String,
+                                 private val s3Client: S3AsyncClient) {
 
-    private fun loadPhoto(resume: String, content: ByteArray) =
+    companion object {
+        fun personalDetailsBucketFolder() = "resume/personalDetails"
+    }
+
+    fun deletePhoto(resumeId: String) =
             Mono.fromCompletionStage {
-                s3Client.putObject(
-                        PutObjectRequest.builder().bucket(this.awsBucket).key(resume).build(),
-                        AsyncRequestBody.fromBytes(content)
-                )
+                s3Client.deleteObject(DeleteObjectRequest
+                        .builder()
+                        .bucket(this.awsBucket)
+                        .key("${personalDetailsBucketFolder()}/$resumeId")
+                        .build())
             }
 
-    private fun getPhoto(resume: String) =
+    fun loadPhoto(resumeId: String, photo: PersonalDetailsPhoto) =
+            if (photo.content.isNotEmpty())
+                photo.content.let {
+                    Mono.fromCompletionStage {
+                        s3Client.putObject(
+                                PutObjectRequest.builder()
+                                        .bucket(this.awsBucket)
+                                        .key("${personalDetailsBucketFolder()}/$resumeId")
+                                        .build(),
+                                AsyncRequestBody.fromBytes(it)
+                        )
+                    }
+                }
+            else
+                Mono.just(PutObjectResponse.builder().build())
+
+    fun getPhoto(resumeId: String) =
             Mono.fromCompletionStage {
                 s3Client.getObject(GetObjectRequest.builder()
                         .bucket(this.awsBucket)
-                        .key(resume)
+                        .key("${personalDetailsBucketFolder()}/$resumeId")
                         .build(),
                         AsyncResponseTransformer.toBytes())
             }.onErrorResume { Mono.just(ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), ByteArray(0))) }
+                    .map {
+                        if (it.asByteArray().size != 0)
+                            PersonalDetailsPhoto(content = it.asByteArray(), fileExtension = it.response().contentType())
+                        else emptyPersonalDetailsPhoto()
+                    }
 }
