@@ -1,5 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository.mapper
 
+import it.valeriovaudi.resume.resumeservice.domain.model.Clock
 import it.valeriovaudi.resume.resumeservice.domain.model.Clock.dateFormatter
 import it.valeriovaudi.resume.resumeservice.domain.model.Education
 import it.valeriovaudi.resume.resumeservice.domain.model.EducationType
@@ -7,7 +8,6 @@ import it.valeriovaudi.resume.resumeservice.getStringOrDefault
 import org.bson.Document
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 object EducationMapper {
 
@@ -17,8 +17,8 @@ object EducationMapper {
                     "company" to education.company,
                     "title" to education.title,
                     "type" to education.type.name,
-                    "dateFrom" to dateFormatter.format(education.dateFrom),
-                    "dateTo" to Optional.ofNullable(education.dateTo).map { dateFormatter.format(it) }.orElse("")) as Map<String, Any>?)
+                    "dateFrom" to Clock.fromLocalDateToString(education.dateFrom),
+                    "dateTo" to Clock.fromLocalDateToString(education.dateTo)) as Map<String, Any>?)
 
 
     fun fromDocumentToDomain(document: Document) =
@@ -27,7 +27,7 @@ object EducationMapper {
                     type = EducationType.valueOf(document.getStringOrDefault("type")),
                     title = document.getStringOrDefault("title"),
                     dateTo = formatOrNull(dateFormatter, document.getStringOrDefault("dateTo")),
-                    dateFrom = LocalDate.from(dateFormatter.parse(document.getStringOrDefault("dateFrom"))))
+                    dateFrom = formatOrNull(dateFormatter, document.getStringOrDefault("dateFrom")))
 
     private fun formatOrNull(dateFormatter: DateTimeFormatter, dateAsString: String): LocalDate? =
             try {

@@ -34,7 +34,7 @@ class MongoEducationRepositoryTest {
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
 
         val resumeId = UUID.randomUUID().toString()
-        val education = Education(id="id", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCOOL)
+        val education = Education(id="id", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCHOOL)
         mongoEducationRepository.save(resumeId, education).toMono().block(Duration.ofMinutes(1))
 
         Assert.assertNotNull(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
@@ -46,8 +46,8 @@ class MongoEducationRepositoryTest {
     fun `findAll education items of a resume`() {
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
 
-        val education1 = Education(id = "id1", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), dateTo = LocalDate.of(2018, 2, 1), type = EducationType.HING_SCOOL)
-        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCOOL)
+        val education1 = Education(id = "id1", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), dateTo = LocalDate.of(2018, 2, 1), type = EducationType.HING_SCHOOL)
+        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCHOOL)
         val resumeId = UUID.randomUUID().toString()
 
         mongoEducationRepository.save(resumeId, education1).toMono().block(Duration.ofMinutes(1))
@@ -64,8 +64,8 @@ class MongoEducationRepositoryTest {
     fun `findOne education items of a resume`() {
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
 
-        val education1 = Education(id = "id1", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), dateTo = LocalDate.of(2018, 2, 1), type = EducationType.HING_SCOOL)
-        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCOOL)
+        val education1 = Education(id = "id1", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), dateTo = LocalDate.of(2018, 2, 1), type = EducationType.HING_SCHOOL)
+        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCHOOL)
         val resumeId = UUID.randomUUID().toString()
 
         mongoEducationRepository.save(resumeId, education1).toMono().block(Duration.ofMinutes(1))
@@ -82,7 +82,7 @@ class MongoEducationRepositoryTest {
     fun `findOne education items not in resume`() {
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
 
-        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCOOL)
+        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCHOOL)
         val resumeId = UUID.randomUUID().toString()
 
         mongoEducationRepository.save(resumeId, education2).toMono().block(Duration.ofMinutes(1))
@@ -97,8 +97,8 @@ class MongoEducationRepositoryTest {
     fun `delete an education title from a resume`() {
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
 
-        val education1 = Education(id = "id1", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), dateTo = LocalDate.of(2018, 2, 1), type = EducationType.HING_SCOOL)
-        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCOOL)
+        val education1 = Education(id = "id1", title = "A_EDUCATION_TITLE", dateFrom = LocalDate.of(2018, 1, 1), dateTo = LocalDate.of(2018, 2, 1), type = EducationType.HING_SCHOOL)
+        val education2 = Education(id = "id2", title = "A_EDUCATION_TITLE2", dateFrom = LocalDate.of(2018, 1, 1), type = EducationType.HING_SCHOOL)
         val resumeId = UUID.randomUUID().toString()
 
         mongoEducationRepository.save(resumeId, education1).toMono().block(Duration.ofMinutes(1))

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.*
 import it.valeriovaudi.resume.resumeservice.domain.repository.ResumeRepository
 import it.valeriovaudi.resume.resumeservice.extractId
+import it.valeriovaudi.resume.resumeservice.web.representation.EducationRepresentation
 import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
 import it.valeriovaudi.resume.resumeservice.web.representation.ResumeRepresentation
 import it.valeriovaudi.todolist.TestContextInitializer
@@ -53,8 +54,21 @@ class ResumeRouteTest {
     @WithMockUser(username = "user")
     fun `find resume`() {
         val resumeId = UUID.randomUUID().toString()
-        val resume = Resume(resumeId, "USER_NAME", Language.EN, PersonalDetails.emptyPersonalDetails(), skill = listOf(Skill("FAMILY", listOf("SKILL_1"))), educations =  listOf(Education(id="1", dateFrom = LocalDate.of(2018,1,1), title = "A_TITLE", type = EducationType.CERTIFICATION)))
-        val resumeRepresentation = ResumeRepresentation(resumeId, "USER_NAME", Language.EN.name, PersonalDetailsRepresentation.fromDomainToRepresentation(PersonalDetails.emptyPersonalDetails()), listOf(Skill("FAMILY", listOf("SKILL_1"))))
+        val resume = Resume(resumeId,
+                "USER_NAME",
+                Language.EN,
+                PersonalDetails.emptyPersonalDetails(),
+                skill = listOf(Skill("FAMILY", listOf("SKILL_1"))),
+                educations = listOf(
+                        Education(id = "1", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION)
+                )
+        )
+        val resumeRepresentation = ResumeRepresentation(resumeId,
+                "USER_NAME",
+                Language.EN.name,
+                PersonalDetailsRepresentation.fromDomainToRepresentation(PersonalDetails.emptyPersonalDetails()),
+                listOf(Skill("FAMILY", listOf("SKILL_1"))),
+                listOf(EducationRepresentation(title = "A_TITLE", type = EducationType.CERTIFICATION, dateFrom = "2018-01-01")))
 
         resumeRepository.save(resume).toMono().block(Duration.ofMinutes(1))
 

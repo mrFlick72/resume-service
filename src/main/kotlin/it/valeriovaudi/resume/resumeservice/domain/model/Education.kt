@@ -10,4 +10,4 @@ data class Education(val id: String,
                      val dateTo: LocalDate? = null)
 
 
-enum class EducationType { HING_SCOOL, BARCHELOR_DEGREE, MASTER_DEGREE, PROFESSIONAL_COURSE, CERTIFICATION }
+enum class EducationType { HING_SCHOOL, BACHELOR_DEGREE, MASTER_DEGREE, PROFESSIONAL_COURSE, CERTIFICATION }

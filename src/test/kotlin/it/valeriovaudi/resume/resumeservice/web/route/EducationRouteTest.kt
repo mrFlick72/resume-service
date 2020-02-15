@@ -42,7 +42,7 @@ class EducationRouteTest {
     @Test
     @WithMockUser(username = "user")
     fun `save a new education`() {
-        val educationRepresentation = EducationRepresentation(title = "A_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = "2018-01-01")
+        val educationRepresentation = EducationRepresentation(title = "A_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = "2018-01-01")
         val resumeId = UUID.randomUUID().toString()
 
         val location = this.webClient.post()
@@ -58,9 +58,9 @@ class EducationRouteTest {
 
     @Test
     fun `update a new education`() {
-        val educationRepresentation = EducationRepresentation(title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = "2018-01-01")
-        val expectedEducation = Education(id = "AN_ID", title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
-        val education = Education(id = "AN_ID", title = "A_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
+        val educationRepresentation = EducationRepresentation(title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = "2018-01-01")
+        val expectedEducation = Education(id = "AN_ID", title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
+        val education = Education(id = "AN_ID", title = "A_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
         val resumeId = UUID.randomUUID().toString()
 
         educationRepository.save(resumeId, education).block(Duration.ofMinutes(1))
@@ -81,9 +81,9 @@ class EducationRouteTest {
     @WithMockUser(username = "user")
     fun `find all education in a resume`() {
         val resumeId = UUID.randomUUID().toString()
-        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
-        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
-        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
 
 
         val educationList = this.webClient.get()
@@ -103,9 +103,9 @@ class EducationRouteTest {
     fun `find one education in a resume`() {
         val resumeId = UUID.randomUUID().toString()
         val id = UUID.randomUUID().toString()
-        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
-        educationRepository.save(resumeId = resumeId, education = Education(id = id, title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
-        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = id, title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
+        educationRepository.save(resumeId = resumeId, education = Education(id = UUID.randomUUID().toString(), title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))).block(Duration.ofMinutes(1))
 
 
         val actualDducation = this.webClient.get()
@@ -118,7 +118,7 @@ class EducationRouteTest {
 
         println(actualDducation)
         Assert.assertNotNull(actualDducation)
-        Assert.assertThat(actualDducation, Is.`is`(Education(id = id, title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))))
+        Assert.assertThat(actualDducation, Is.`is`(Education(id = id, title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))))
     }
 
 }
