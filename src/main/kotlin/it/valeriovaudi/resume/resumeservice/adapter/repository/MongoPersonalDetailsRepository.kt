@@ -14,11 +14,13 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
 import reactor.core.publisher.Mono
+import software.amazon.awssdk.core.ResponseBytes
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.core.async.AsyncResponseTransformer
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.model.GetObjectResponse
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTemplate,
@@ -67,8 +69,11 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                         val personalData = it.t1
                         val resource = it.t2
 
-                        val photo = PersonalDetailsPhoto(content = resource.asByteArray(),
-                                fileExtension = resource.response().contentType())
+                        val photo = if (resource.asByteArray().size != 0)
+                            PersonalDetailsPhoto(content = resource.asByteArray(),
+                                    fileExtension = resource.response().contentType())
+                        else PersonalDetailsPhoto.emptyPersonalDetailsPhoto()
+
                         PersonalDetailsMapper.fromDocumentToDomain(document = personalData, photo = photo)
                     }
 
@@ -95,5 +100,5 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                         .key(resume)
                         .build(),
                         AsyncResponseTransformer.toBytes())
-            }
+            }.onErrorResume { Mono.just(ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), ByteArray(0))) }
 }

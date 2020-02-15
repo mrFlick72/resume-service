@@ -1,6 +1,7 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import it.valeriovaudi.resume.resumeservice.TestCase
+import it.valeriovaudi.resume.resumeservice.TestableS3AsyncClient
 import org.bson.Document
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert
@@ -9,15 +10,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query.query
-import org.springframework.data.mongodb.gridfs.GridFsOperations
-import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.test.context.junit4.SpringRunner
 import reactor.core.publisher.toMono
-import software.amazon.awssdk.services.s3.S3AsyncClient
 import java.time.Duration
 import java.util.*
 
@@ -32,12 +29,9 @@ class MongoPersonalDetailsRepositoryTest {
 
     lateinit var mongoPersonalDetailsRepository: MongoPersonalDetailsRepository
 
-    @MockBean
-    lateinit var s3AsyncClient : S3AsyncClient
-
     @Before
     fun setUp() {
-        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate,"",s3AsyncClient)
+        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate,TestableS3AsyncClient.bucket,TestableS3AsyncClient.s3AsyncClient())
     }
 
     @Test

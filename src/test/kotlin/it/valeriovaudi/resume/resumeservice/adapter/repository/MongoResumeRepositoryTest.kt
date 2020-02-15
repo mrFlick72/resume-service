@@ -1,6 +1,7 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository
 
 import it.valeriovaudi.resume.resumeservice.TestCase
+import it.valeriovaudi.resume.resumeservice.TestableS3AsyncClient
 import it.valeriovaudi.resume.resumeservice.domain.model.*
 import org.bson.Document
 import org.hamcrest.core.Is
@@ -30,9 +31,6 @@ class MongoResumeRepositoryTest {
     @Autowired
     lateinit var mongoTemplate: ReactiveMongoTemplate
 
-    @Autowired
-    lateinit var gridFsTemplate: GridFsTemplate
-
     lateinit var mongoResumeRepository: MongoResumeRepository
 
     lateinit var mongoPersonalDetailsRepository: MongoPersonalDetailsRepository
@@ -42,15 +40,14 @@ class MongoResumeRepositoryTest {
     lateinit var mongoEducationRepository: MongoEducationRepository
 
     lateinit var mongoWorkExperienceRepository: MongoWorkExperienceRepository
-    @MockBean
-    lateinit var s3AsyncClient : S3AsyncClient
+
 
     @Before
     fun setUp() {
         mongoWorkExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
         mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
-        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, "",s3AsyncClient)
+        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, TestableS3AsyncClient.bucket,TestableS3AsyncClient.s3AsyncClient())
         mongoResumeRepository = MongoResumeRepository(mongoTemplate,
                 mongoPersonalDetailsRepository,
                 mongoSkillsRepository,
@@ -75,8 +72,6 @@ class MongoResumeRepositoryTest {
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
-        Assert.assertNotNull(gridFsTemplate.findOne(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))))
-        Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
         Assert.assertNotNull(actualResumeDocument)
     }
 
@@ -96,8 +91,6 @@ class MongoResumeRepositoryTest {
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
-        Assert.assertNotNull(gridFsTemplate.findOne(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))))
-        Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
         Assert.assertNotNull(actualResumeDocument)
 
         println("skills")
@@ -194,8 +187,6 @@ class MongoResumeRepositoryTest {
                 .block(Duration.ofMinutes(2)))
 
         println("photo")
-        Assert.assertNotNull(gridFsTemplate.findOne(Query.query(Criteria.where("metadata.resumeId").`is`(resumeId))))
-        Assert.assertNotNull(gridFsTemplate.getResource(resumeId))
     }
 
     private fun anEmptyResume(resumeId: String) =

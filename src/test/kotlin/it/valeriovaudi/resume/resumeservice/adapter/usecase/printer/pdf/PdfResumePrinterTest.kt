@@ -1,6 +1,8 @@
 package it.valeriovaudi.resume.resumeservice.adapter.usecase.printer.pdf
 
 import it.valeriovaudi.resume.resumeservice.TestCase
+import it.valeriovaudi.resume.resumeservice.TestableS3AsyncClient
+import it.valeriovaudi.resume.resumeservice.TestableS3AsyncClient.bucket
 import it.valeriovaudi.resume.resumeservice.adapter.repository.*
 import it.valeriovaudi.resume.resumeservice.domain.model.Language
 import it.valeriovaudi.resume.resumeservice.domain.model.Resume
@@ -44,15 +46,12 @@ class PdfResumePrinterTest {
 
     lateinit var pdfResumePrinter: PdfResumePrinter
 
-    @MockBean
-    lateinit var s3AsyncClient: S3AsyncClient
-
     @Before
     fun setUp() {
         mongoWorkExperienceRepository = MongoWorkExperienceRepository(mongoTemplate)
         mongoEducationRepository = MongoEducationRepository(mongoTemplate)
         mongoSkillsRepository = MongoSkillsRepository(mongoTemplate)
-        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, "", s3AsyncClient)
+        mongoPersonalDetailsRepository = MongoPersonalDetailsRepository(mongoTemplate, bucket, TestableS3AsyncClient.s3AsyncClient())
         mongoResumeRepository = MongoResumeRepository(mongoTemplate,
                 mongoPersonalDetailsRepository,
                 mongoSkillsRepository,
