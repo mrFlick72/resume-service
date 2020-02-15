@@ -26,16 +26,12 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
                                      @Value("\${aws.s3.bucket}") private val awsBucket: String,
                                      private val s3Client: S3AsyncClient) : PersonalDetailsRepository {
 
-    private var photoRepository: S3PhotoRepository
-
-    init {
-        photoRepository = S3PhotoRepository(awsBucket, s3Client)
-    }
-
     companion object {
         fun collectionName() = "personalDetails"
         fun findOneQuery(resumeId: String) = Query.query(Criteria.where("resumeId").isEqualTo(resumeId))
     }
+
+    private var photoRepository: S3PhotoRepository = S3PhotoRepository(awsBucket, s3Client)
 
     override fun delete(resumeId: String) =
             Mono.zip(
@@ -44,16 +40,19 @@ class MongoPersonalDetailsRepository(private val mongoTemplate: ReactiveMongoTem
             ).flatMap { Mono.just(Unit) }
 
     override fun save(resumeId: String, personalDetails: PersonalDetails): Publisher<PersonalDetails> {
-        val personalDetailsMono =
-                mongoTemplate.upsert(findOneQuery(resumeId),
-                        Update.fromDocument(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails)), collectionName())
-                        .onErrorResume { println("Error at ${it}"); Mono.just(UpdateResult.unacknowledged()) }
+        val personalDetailsMono = storePersonaDetails(resumeId, personalDetails)
 
         val photoData = photoRepository.loadPhoto(resumeId, personalDetails.photo)
 
         return Mono.zip(personalDetailsMono, photoData)
                 .map { personalDetails }
                 .onErrorReturn(PersonalDetails.emptyPersonalDetails())
+    }
+
+    private fun storePersonaDetails(resumeId: String, personalDetails: PersonalDetails): Mono<UpdateResult> {
+        return mongoTemplate.upsert(findOneQuery(resumeId),
+                Update.fromDocument(PersonalDetailsMapper.fromDomainToDocument(resumeId, personalDetails)), collectionName())
+                .onErrorResume { println("Error at ${it}"); Mono.just(UpdateResult.unacknowledged()) }
     }
 
     override fun findOneWithoutPhoto(resumeId: String): Publisher<PersonalDetails> =

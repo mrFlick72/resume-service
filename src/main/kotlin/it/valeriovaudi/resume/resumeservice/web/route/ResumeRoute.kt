@@ -29,9 +29,9 @@ class ResumeRoute {
 
         POST("/resume")
         {
-            it.principal().flatMap {
-                resumeRepository.save(Resume.emptyResume(UUID.randomUUID().toString(), it.name, Language.EN)).toMono()
-            }.flatMap { created(URI("${baseServer}/resume/${it.id}")).build() }
+            val userName = "valerio.vaudi@gmail.com" //todo remove it when auth will be introduced
+            resumeRepository.save(Resume.emptyResume(UUID.randomUUID().toString(), userName, Language.EN)).toMono()
+                    .flatMap { created(URI("${baseServer}/resume/${it.id}")).build() }
         }
 
     }
