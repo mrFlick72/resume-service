@@ -1,5 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository.mapper
 
+import it.valeriovaudi.resume.resumeservice.domain.model.Clock.dateFormatter
 import it.valeriovaudi.resume.resumeservice.domain.model.Education
 import it.valeriovaudi.resume.resumeservice.domain.model.EducationType
 import it.valeriovaudi.resume.resumeservice.getStringOrDefault
@@ -9,7 +10,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 object EducationMapper {
-    val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
     fun fromDomainToDocument(resumeId: String, education: Education) =
             Document(mutableMapOf("_id" to education.id,
@@ -18,7 +18,7 @@ object EducationMapper {
                     "title" to education.title,
                     "type" to education.type.name,
                     "dateFrom" to dateFormatter.format(education.dateFrom),
-                    "dateTo" to Optional.ofNullable(education.dateTo).map { EducationMapper.dateFormatter.format(it) }.orElse("")) as Map<String, Any>?)
+                    "dateTo" to Optional.ofNullable(education.dateTo).map { dateFormatter.format(it) }.orElse("")) as Map<String, Any>?)
 
 
     fun fromDocumentToDomain(document: Document) =

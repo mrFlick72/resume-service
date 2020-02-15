@@ -1,5 +1,8 @@
 package it.valeriovaudi.resume.resumeservice.web.representation
 
+import it.valeriovaudi.resume.resumeservice.domain.model.Clock.dateFormatter
+import it.valeriovaudi.resume.resumeservice.domain.model.Clock.fromLocalDateToString
+import it.valeriovaudi.resume.resumeservice.domain.model.Clock.fromStringToLocalDate
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.model.Sex
@@ -13,7 +16,7 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                                          var region: String? = "",
                                          var mail: String? = "",
                                          var mobile: String? = "",
-                                         var birthDate: LocalDate? = null,
+                                         var birthDate: String? = null,
                                          var country: String? = "",
                                          var sex: Sex? = Sex.NONE,
                                          var taxCode: String? = "") {
@@ -23,7 +26,7 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                     firstName = personalDetails.firstName!!,
                     lastName = personalDetails.lastName!!,
                     address = personalDetails.address!!,
-                    birthDate = personalDetails.birthDate,
+                    birthDate = fromStringToLocalDate(personalDetails.birthDate),
                     city = personalDetails.city!!,
                     mail = personalDetails.mail!!,
                     mobile = personalDetails.mobile!!,
@@ -40,7 +43,7 @@ data class PersonalDetailsRepresentation(var firstName: String? = "",
                 PersonalDetailsRepresentation(firstName = personalDetails.firstName,
                         lastName = personalDetails.lastName,
                         address = personalDetails.address,
-                        birthDate = personalDetails.birthDate,
+                        birthDate = fromLocalDateToString(personalDetails.birthDate),
                         city = personalDetails.city,
                         mail = personalDetails.mail,
                         mobile = personalDetails.mobile,

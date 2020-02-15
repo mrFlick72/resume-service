@@ -42,7 +42,7 @@ class EducationRouteTest {
     @Test
     @WithMockUser(username = "user")
     fun `save a new education`() {
-        val educationRepresentation = EducationRepresentation(title = "A_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
+        val educationRepresentation = EducationRepresentation(title = "A_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = "2018-01-01")
         val resumeId = UUID.randomUUID().toString()
 
         val location = this.webClient.post()
@@ -58,7 +58,7 @@ class EducationRouteTest {
 
     @Test
     fun `update a new education`() {
-        val educationRepresentation = EducationRepresentation(title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
+        val educationRepresentation = EducationRepresentation(title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = "2018-01-01")
         val expectedEducation = Education(id = "AN_ID", title = "A_NEW_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
         val education = Education(id = "AN_ID", title = "A_TITLE", type = EducationType.BARCHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))
         val resumeId = UUID.randomUUID().toString()

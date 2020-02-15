@@ -1,5 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.repository.mapper
 
+import it.valeriovaudi.resume.resumeservice.domain.model.Clock.dateFormatter
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetails
 import it.valeriovaudi.resume.resumeservice.domain.model.PersonalDetailsPhoto
 import it.valeriovaudi.resume.resumeservice.domain.model.Sex
@@ -10,8 +11,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 object PersonalDetailsMapper {
-
-    val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
     fun fromDomainToDocument(resumeId: String, personalDetails: PersonalDetails) =
             Document(mutableMapOf("resumeId" to resumeId,

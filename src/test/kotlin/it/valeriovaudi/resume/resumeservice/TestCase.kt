@@ -8,10 +8,11 @@ import java.time.LocalDate
 
 object TestCase {
     val birthDate = LocalDate.of(2018, 8, 30)
+    val birthDateStr = "2018-08-30"
 
     fun personalDetailsRepresentation() = PersonalDetailsRepresentation("firstName",
             "lastName", "address", "zip", "city",
-            "region", "mail", "mobile", birthDate,
+            "region", "mail", "mobile", birthDateStr,
             "country", Sex.NONE, "taxCode")
 
     fun personalDetails() = PersonalDetails(PersonalDetailsPhoto.emptyPersonalDetailsPhoto(), "firstName",

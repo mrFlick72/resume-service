@@ -40,7 +40,7 @@ class WorkExperienceRouteTest {
     @Test
     @WithMockUser(username = "user")
     fun `save a new workexperience`() {
-        val workExperienceRepresentation = WorkExperienceRepresentation(startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"))
+        val workExperienceRepresentation = WorkExperienceRepresentation(startDate = "2018-01-01", endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"))
         val resumeId = UUID.randomUUID().toString()
 
         val location = this.webClient.post()
@@ -56,7 +56,7 @@ class WorkExperienceRouteTest {
 
     @Test
     fun `update a new work experience`() {
-        val workExperienceRepresentation = WorkExperienceRepresentation(startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))
+        val workExperienceRepresentation = WorkExperienceRepresentation(startDate = "2018-01-01", endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))
         val expectedWorkExperience = WorkExperience(id = "AN_ID", startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))
 
         val workExperience = WorkExperience(id = "AN_ID", startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="", commitments = listOf())

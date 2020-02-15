@@ -6,7 +6,7 @@ data class Education(val id: String,
                      val company: String? = null,
                      val title: String,
                      val type: EducationType,
-                     val dateFrom: LocalDate,
+                     val dateFrom: LocalDate? = null,
                      val dateTo: LocalDate? = null)
 
 
