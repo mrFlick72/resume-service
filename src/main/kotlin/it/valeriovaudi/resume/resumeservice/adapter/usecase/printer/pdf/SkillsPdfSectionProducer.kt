@@ -12,10 +12,13 @@ class SkillsPdfSectionProducer() {
         table.addCell(CellFactory.newSectionCell("Skills")).addCell(CellFactory.newSecondCell(""))
 
         skill.forEach {
-            table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(it.family))
+            table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(it.family, true))
             it.skills.forEach {
                 table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(it))
             }
+            table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(""))
+            table.addCell(CellFactory.newFirstCell("")).addCell(CellFactory.newSecondCell(""))
+
         }
     }
 

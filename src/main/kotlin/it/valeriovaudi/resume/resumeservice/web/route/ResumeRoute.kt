@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_PDF
 import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.server.RouterFunctions.route
 import org.springframework.web.reactive.function.server.ServerResponse.created
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.router
@@ -25,25 +27,22 @@ class ResumeRoute {
     fun resumeRoutes(@Value("\${baseServer:http://localhost:8080}") baseServer: String,
                      resumeRepository: ResumeRepository,
                      resumePrinter: ResumePrinter) = router {
+        (accept(APPLICATION_PDF)  and GET("/resume/{resumeId}"))
+                .invoke {
+                    println("rotta invocata")
+                    val resumeId = it.pathVariable("resumeId").removeSuffix(".pdf")
+                    resumePrinter.printResumeFor(resumeId)
+                            .flatMap { println("${it.size}");ok().body(BodyInserters.fromValue(it)) }
+                }
+
         GET("/resume/{resumeId}")
         {
+            println("rotta json invocata")
+
             val resumeId = it.pathVariable("resumeId")
             resumeRepository.findOne(resumeId).toMono()
                     .flatMap { ok().body(BodyInserters.fromObject(ResumeRepresentation.fromDomainToRepresentation(it))) }
         }
-
-        accept(MediaType.APPLICATION_PDF)
-                .and(GET("/resume/{resumeId}"))
-                .invoke {
-                    println("rotta invocata")
-                    val resumeId = it.pathVariable("resumeId")
-                    Mono.fromCallable { resumePrinter.printResumeFor(resumeId) }
-                            .flatMap { Mono.fromCallable { it.use { it.readAllBytes() } } }
-                            .flatMap {
-                                ok().body(BodyInserters.fromValue(it))
-                            }
-                }
-
 
         POST("/resume")
         {

@@ -6,6 +6,7 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Table
 import it.valeriovaudi.resume.resumeservice.adapter.repository.MongoResumeRepository
+import it.valeriovaudi.resume.resumeservice.domain.model.Resume
 import it.valeriovaudi.resume.resumeservice.domain.usecase.ResumePrinter
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
@@ -29,42 +30,43 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository,
         }
     }
 
-    override fun printResumeFor(resumeId: String): InputStream {
-        val pdfPath = Files.createTempFile(UUID.randomUUID().toString(), ".pdf")
-
-        Files.newOutputStream(pdfPath).use { pdfStream ->
-            PdfWriter(pdfStream).use { pdfWriter ->
-                PdfDocument(pdfWriter).use { pdfDocument ->
-                    val document = Document(pdfDocument)
-                    this.makePdf(resumeId, document)
-                    document.close()
-                }
-            }
-
-            return FileInputStream(pdfPath.toFile())
-        }
-    }
-
-    private fun makePdf(resumeId: String, document: Document): Unit? {
+    override fun printResumeFor(resumeId: String): Mono<ByteArray>{
+        println("resumeId: $resumeId")
         return this.resumeRepository.findOne(resumeId).toMono()
-                .flatMap {
-                    document.setFontSize(14f)
+                .map { resume ->
+                    println(resume)
+                    val pdfPath = Files.createTempFile(UUID.randomUUID().toString(), ".pdf")
 
-                    val table = Table(2).setWidth(PageSize.A4.width * 0.80f).setAutoLayout()
-                    table.setPaddingRight(25f)
-                    table.setMarginRight(25f)
+                    Files.newOutputStream(pdfPath).use { pdfStream ->
+                        PdfWriter(pdfStream).use { pdfWriter ->
+                            PdfDocument(pdfWriter).use { pdfDocument ->
+                                val document = Document(pdfDocument)
+                                this.makePdf(resume, document)
+                                document.close()
+                            }
+                        }
 
-                    personalDetailsPdfSectionProducer.newPersonalDetailsCells(table, it.personalDetails)
-                    newEmptyCells(table)
-                    skillsPdfSectionProducer.newSkillCells(table, it.skill)
-                    newEmptyCells(table)
-                    educationsPdfSectionProducer.newEducationsCells(table, it.educations)
-                    workExperiencePdfSectionProducer.newWorkExperienceCells(table, it.workExperience)
+                        println("OK")
+                        FileInputStream(pdfPath.toFile()).readAllBytes()
+                    }
+                }
 
-                    document.add(table)
+    }
+    private fun makePdf(resume: Resume, document: Document) {
+            document.setFontSize(14f)
 
-                    Mono.just(Unit)
-                }.block()
+            val table = Table(2).setWidth(PageSize.A4.width * 0.80f).setAutoLayout()
+            table.setPaddingRight(25f)
+            table.setMarginRight(25f)
+
+            personalDetailsPdfSectionProducer.newPersonalDetailsCells(table, resume.personalDetails)
+            newEmptyCells(table)
+            skillsPdfSectionProducer.newSkillCells(table, resume.skill)
+            newEmptyCells(table)
+            educationsPdfSectionProducer.newEducationsCells(table, resume.educations)
+            workExperiencePdfSectionProducer.newWorkExperienceCells(table, resume.workExperience)
+
+            document.add(table)
     }
 
 }

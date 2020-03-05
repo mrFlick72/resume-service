@@ -30,8 +30,13 @@ object CellFactory {
         return newCell(isFirstColumn = true, withRightBorder = true).add(Paragraph(content))
     }
 
-    fun newSecondCell(content: String): Cell {
-        return newCell().add(Paragraph(content))
+    fun newSecondCell(content: String, bold: Boolean = false): Cell {
+        val cell = newCell().add(Paragraph(content))
+        return if(bold){
+            cell.setBold()
+        } else{
+            cell
+        }
     }
 
     fun newCell(withRightBorder: Boolean = false, isFirstColumn: Boolean = false): Cell {

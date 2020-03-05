@@ -73,7 +73,7 @@ class PdfResumePrinterTest {
 
         val inputStream = pdfResumePrinter.printResumeFor(resumeId)
 
-        Files.write(Paths.get(UUID.randomUUID().toString() + ".pdf"), inputStream.readAllBytes())
+        Files.write(Paths.get(UUID.randomUUID().toString() + ".pdf"), inputStream.block()!!)
 
     }
 }
