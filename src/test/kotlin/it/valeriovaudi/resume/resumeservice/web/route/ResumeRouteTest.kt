@@ -3,6 +3,7 @@ package it.valeriovaudi.resume.resumeservice.web.route
 import com.fasterxml.jackson.databind.ObjectMapper
 import it.valeriovaudi.resume.resumeservice.domain.model.*
 import it.valeriovaudi.resume.resumeservice.domain.repository.ResumeRepository
+import it.valeriovaudi.resume.resumeservice.domain.usecase.ResumePrinter
 import it.valeriovaudi.resume.resumeservice.extractId
 import it.valeriovaudi.resume.resumeservice.web.representation.EducationRepresentation
 import it.valeriovaudi.resume.resumeservice.web.representation.PersonalDetailsRepresentation
@@ -13,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
@@ -32,10 +34,41 @@ class ResumeRouteTest {
     private lateinit var webClient: WebTestClient
 
     @Autowired
+    private lateinit var resumePrinter: ResumePrinter
+
+    @Autowired
     private lateinit var resumeRepository: ResumeRepository
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
+
+    @Test
+    @WithMockUser(username = "user")
+    fun `print a resume`() {
+        val resumeId = UUID.randomUUID().toString()
+        val resume = Resume(resumeId,
+                "USER_NAME",
+                Language.EN,
+                PersonalDetails.emptyPersonalDetails(),
+                skill = listOf(Skill("FAMILY", listOf("SKILL_1"))),
+                educations = listOf(
+                        Education(id = "1", dateFrom = LocalDate.of(2018, 1, 1), title = "A_TITLE", type = EducationType.CERTIFICATION)
+                )
+        )
+
+
+        resumeRepository.save(resume).toMono().block(Duration.ofMinutes(1))
+
+        webClient.get()
+                .uri("/resume/${resume.id}")
+                .accept(MediaType.APPLICATION_PDF)
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .consumeWith {
+                    Assert.assertTrue(it.responseBodyContent?.isNotEmpty()!!)
+                }
+    }
 
     @Test
     @WithMockUser(username = "user")

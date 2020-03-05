@@ -1,5 +1,6 @@
 package it.valeriovaudi.resume.resumeservice
 
+import it.valeriovaudi.resume.resumeservice.web.config.PrinterConfig
 import it.valeriovaudi.resume.resumeservice.web.config.RepositoryConfig
 import org.bson.Document
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -11,7 +12,10 @@ class ResumeServiceApplication
 
 fun main(args: Array<String>) {
     runApplication<ResumeServiceApplication>(*args) {
-        addInitializers(RepositoryConfig.beans())
+        addInitializers(
+                RepositoryConfig.beans(),
+                PrinterConfig.beans()
+        )
     }
 }
 
