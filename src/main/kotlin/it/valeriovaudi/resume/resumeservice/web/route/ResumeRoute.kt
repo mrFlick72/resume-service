@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.MediaType.APPLICATION_PDF
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.RouterFunctions.route
@@ -27,23 +28,24 @@ class ResumeRoute {
     fun resumeRoutes(@Value("\${baseServer:http://localhost:8080}") baseServer: String,
                      resumeRepository: ResumeRepository,
                      resumePrinter: ResumePrinter) = router {
-        (accept(APPLICATION_PDF)  and GET("/resume/{resumeId}"))
+
+
+        GET("/resume/{resumeId}").and(accept(APPLICATION_JSON))
+                .invoke {
+                    println("rotta json invocata")
+
+                    val resumeId = it.pathVariable("resumeId")
+                    resumeRepository.findOne(resumeId).toMono()
+                            .flatMap { ok().body(BodyInserters.fromValue(ResumeRepresentation.fromDomainToRepresentation(it))) }
+                }
+
+        GET("/resume/{resumeId}").and(accept(APPLICATION_PDF))
                 .invoke {
                     println("rotta invocata")
                     val resumeId = it.pathVariable("resumeId").removeSuffix(".pdf")
                     resumePrinter.printResumeFor(resumeId)
                             .flatMap { println("${it.size}");ok().body(BodyInserters.fromValue(it)) }
                 }
-
-        GET("/resume/{resumeId}")
-        {
-            println("rotta json invocata")
-
-            val resumeId = it.pathVariable("resumeId")
-            resumeRepository.findOne(resumeId).toMono()
-                    .flatMap { ok().body(BodyInserters.fromObject(ResumeRepresentation.fromDomainToRepresentation(it))) }
-        }
-
         POST("/resume")
         {
             val userName = "valerio.vaudi@gmail.com" //todo remove it when auth will be introduced

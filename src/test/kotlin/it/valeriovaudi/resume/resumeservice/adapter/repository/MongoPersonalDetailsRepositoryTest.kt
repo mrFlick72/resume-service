@@ -18,7 +18,6 @@ import reactor.core.publisher.toMono
 import java.time.Duration
 import java.util.*
 
-
 @DataMongoTest
 @RunWith(SpringRunner::class)
 class MongoPersonalDetailsRepositoryTest {
@@ -45,13 +44,9 @@ class MongoPersonalDetailsRepositoryTest {
                     Assert.assertThat(it, `is`(personalDetails))
                 }
 
-
-        println("details")
         Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
-
-        println("photo")
     }
 
     @Test
@@ -63,13 +58,9 @@ class MongoPersonalDetailsRepositoryTest {
                     Assert.assertThat(it, `is`(personalDetails))
                 }
 
-
-        println("details")
         Assert.assertNotNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
-
-        println("photo")
     }
 
     @Test
@@ -86,9 +77,6 @@ class MongoPersonalDetailsRepositoryTest {
                 .toMono().block(Duration.ofMinutes(2))
 
         Assert.assertNotNull(actual)
-        println(actual!!.photo.content.size)
-        println(actual.photo.fileExtension)
-        println(actual.firstName)
     }
 
     @Test
@@ -127,17 +115,10 @@ class MongoPersonalDetailsRepositoryTest {
         val actual = mongoPersonalDetailsRepository.findOne(resumeId)
                 .toMono().block(Duration.ofMinutes(2))
 
-        println(actual!!.photo.content.size)
-        println(actual.photo.fileExtension)
-        println(actual.firstName)
-
         mongoPersonalDetailsRepository.delete(resumeId).toMono().block(Duration.ofMinutes(1))
 
-        println("details")
         Assert.assertNull(mongoTemplate.findOne(query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
-
-        println("photo")
     }
 }

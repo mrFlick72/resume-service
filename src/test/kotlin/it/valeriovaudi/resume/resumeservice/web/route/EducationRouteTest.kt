@@ -36,9 +36,6 @@ class EducationRouteTest {
     @Autowired
     private lateinit var educationRepository: MongoEducationRepository
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper;
-
     @Test
     @WithMockUser(username = "user")
     fun `save a new education`() {
@@ -52,8 +49,7 @@ class EducationRouteTest {
                 .expectStatus().isCreated
                 .returnResult<Any>().responseHeaders.location
 
-        println(location!!.extractId())
-        Assert.assertNotNull(location.extractId())
+        Assert.assertNotNull(location!!.extractId())
     }
 
     @Test
@@ -93,7 +89,6 @@ class EducationRouteTest {
                 .returnResult<Education>().responseBody
                 .collectList().block(Duration.ofMinutes(1))
 
-        println(educationList)
         Assert.assertNotNull(educationList)
         Assert.assertThat((educationList as MutableList).size, Is.`is`(3))
     }
@@ -116,7 +111,6 @@ class EducationRouteTest {
                 .toMono<Education>()
                 .block(Duration.ofMinutes(1))
 
-        println(actualDducation)
         Assert.assertNotNull(actualDducation)
         Assert.assertThat(actualDducation, Is.`is`(Education(id = id, title = "A_NEW_TITLE", type = EducationType.BACHELOR_DEGREE, dateFrom = LocalDate.of(2018, 1, 1))))
     }

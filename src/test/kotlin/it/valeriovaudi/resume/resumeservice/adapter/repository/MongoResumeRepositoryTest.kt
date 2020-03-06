@@ -66,12 +66,10 @@ class MongoResumeRepositoryTest {
                 Document::class.java, "resume")
                 .block(Duration.ofMinutes(2))
 
-        println("details")
         Assert.assertNotNull(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
 
-        println("photo")
         Assert.assertNotNull(actualResumeDocument)
     }
 
@@ -85,29 +83,24 @@ class MongoResumeRepositoryTest {
                 Document::class.java, "resume")
                 .block(Duration.ofMinutes(2))
 
-        println("details")
         Assert.assertNotNull(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
 
-        println("photo")
         Assert.assertNotNull(actualResumeDocument)
 
-        println("skills")
         val actualSkills = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "skill").collectList()
                 .block(Duration.ofMinutes(2))
         Assert.assertNotNull(actualSkills)
         Assert.assertThat((actualSkills as MutableList).size, Is.`is`(1))
 
-        println("education")
         val actualEducation = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "education").collectList()
                 .block(Duration.ofMinutes(2))
         Assert.assertNotNull(actualEducation)
         Assert.assertThat((actualEducation as MutableList).size, Is.`is`(2))
 
-        println("workExperience")
         val actualWorkExperience = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "workExperience").collectList()
                 .block(Duration.ofMinutes(2))
@@ -124,23 +117,17 @@ class MongoResumeRepositoryTest {
                 .flatMap { mongoResumeRepository.findOne(resumeId).toMono() }
                 .block(Duration.ofMinutes(1))
 
-        println("details")
         Assert.assertNotNull(actualResume!!.personalDetails)
         Assert.assertNotNull(actualResume.personalDetails.photo)
 
-        println("photo")
-
-        println("skills")
         val actualSkills = actualResume.skill
         Assert.assertNotNull(actualSkills)
         Assert.assertThat((actualSkills as MutableList).size, Is.`is`(1))
 
-        println("education")
         val actualEducation = actualResume.educations
         Assert.assertNotNull(actualEducation)
         Assert.assertThat((actualEducation as MutableList).size, Is.`is`(2))
 
-        println("workExperience")
         val actualWorkExperience = actualResume.workExperience
         Assert.assertNotNull(actualWorkExperience)
         Assert.assertThat((actualWorkExperience as MutableList).size, Is.`is`(2))
@@ -181,12 +168,9 @@ class MongoResumeRepositoryTest {
                 .then(mongoResumeRepository.delete(resumeId).toMono())
                 .block(Duration.ofMinutes(1))
 
-        println("details")
         Assert.assertNotNull(mongoTemplate.findOne(Query.query(Criteria.where("resumeId").`is`(resumeId)),
                 Document::class.java, "personalDetails")
                 .block(Duration.ofMinutes(2)))
-
-        println("photo")
     }
 
     private fun anEmptyResume(resumeId: String) =

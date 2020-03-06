@@ -31,9 +31,6 @@ class PdfResumePrinterTest {
     @Autowired
     lateinit var mongoTemplate: ReactiveMongoTemplate
 
-    @Autowired
-    lateinit var gridFsTemplate: GridFsTemplate
-
     lateinit var mongoResumeRepository: MongoResumeRepository
 
     lateinit var mongoPersonalDetailsRepository: MongoPersonalDetailsRepository

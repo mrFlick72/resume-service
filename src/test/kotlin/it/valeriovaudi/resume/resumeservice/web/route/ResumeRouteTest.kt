@@ -107,6 +107,7 @@ class ResumeRouteTest {
 
         webClient.get()
                 .uri("/resume/${resume.id}")
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk
                 .expectBody()

@@ -45,7 +45,6 @@ class MongoWorkExperienceRepositoryTest {
                 .and("resumeId").isEqualTo(resumeId)), Document::class.java, "workExperience")
                 .block(Duration.ofMinutes(1))
 
-        println(actualWorkExperience)
         Assert.assertNotNull(actualWorkExperience)
     }
 
@@ -72,7 +71,6 @@ class MongoWorkExperienceRepositoryTest {
 
         val actualWorkExperience = workExperienceRepository.findOne(resumeId, aWorkExperience.id).toMono().block(Duration.ofMinutes(1))
 
-        println(actualWorkExperience)
         Assert.assertNotNull(actualWorkExperience)
         Assert.assertThat(actualWorkExperience, Is.`is`(aWorkExperience))
     }
@@ -99,7 +97,6 @@ class MongoWorkExperienceRepositoryTest {
 
         val actualWorkExperience = workExperienceRepository.findOne(resumeId, "").toMono().block(Duration.ofMinutes(1))
 
-        println(actualWorkExperience)
         Assert.assertNull(actualWorkExperience)
     }
 
@@ -125,7 +122,6 @@ class MongoWorkExperienceRepositoryTest {
         val actualWorkExperience = workExperienceRepository.findAll(resumeId).toFlux().collectList()
                 .block(Duration.ofMinutes(1))
 
-        println(actualWorkExperience)
         Assert.assertNotNull(actualWorkExperience)
         Assert.assertThat((actualWorkExperience as MutableList).size, Is.`is`(2))
     }
@@ -139,7 +135,6 @@ class MongoWorkExperienceRepositoryTest {
         val actualWorkExperience = workExperienceRepository.findAll(resumeId).toFlux().collectList()
                 .block(Duration.ofMinutes(1))
 
-        println(actualWorkExperience)
         Assert.assertNotNull(actualWorkExperience)
         Assert.assertThat((actualWorkExperience as MutableList).size, Is.`is`(0))
     }
@@ -172,7 +167,6 @@ class MongoWorkExperienceRepositoryTest {
                 .and("resumeId").isEqualTo(resumeId)), Document::class.java, "workExperience")
                 .block(Duration.ofMinutes(1))
 
-        println(actualWorkExperience)
         Assert.assertNull(actualWorkExperience)
         Assert.assertThat((actualWorkExperienceList as MutableList).size, Is.`is`(1))
     }

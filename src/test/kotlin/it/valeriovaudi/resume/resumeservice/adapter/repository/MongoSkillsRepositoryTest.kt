@@ -71,7 +71,6 @@ class MongoSkillsRepositoryTest {
 
         val actual = mongoTemplate.find(Query.query(Criteria.where("resumeId").`is`(resumeId)), Document::class.java, "skill")
                 .collectList().block(Duration.ofMinutes(1))
-        println(actual)
 
         assertThat((actual as List<Document>).size, Is.`is`(2))
         assertNotNull(actual)
@@ -104,7 +103,6 @@ class MongoSkillsRepositoryTest {
         val allSkills = mongoSkillsRepository.findAll(resumeId).toFlux().collectList()
                 .block(Duration.ofMinutes(2))
 
-        println(allSkills)
         assertNotNull(allSkills)
         assertThat((allSkills as MutableList).size, Is.`is`(2))
         assertThat(allSkills, Matchers.containsInAnyOrder(Skill("A_FAMILY", listOf("Skill_1", "Skill_2", "Skill_3")),

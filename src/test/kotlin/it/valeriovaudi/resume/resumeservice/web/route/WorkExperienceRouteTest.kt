@@ -50,8 +50,7 @@ class WorkExperienceRouteTest {
                 .expectStatus().isCreated
                 .returnResult<Any>().responseHeaders.location
 
-        println(location!!.extractId())
-        Assert.assertNotNull(location.extractId())
+        Assert.assertNotNull(location!!.extractId())
     }
 
     @Test
@@ -89,7 +88,6 @@ class WorkExperienceRouteTest {
                 .returnResult<WorkExperience>().responseBody
                 .collectList().block(Duration.ofMinutes(1))
 
-        println(educationList)
         Assert.assertNotNull(educationList)
         Assert.assertThat((educationList as MutableList).size, Is.`is`(2))
     }
@@ -111,7 +109,6 @@ class WorkExperienceRouteTest {
                 .toMono<WorkExperience>()
                 .block(Duration.ofMinutes(1))
 
-        println(actualDducation)
         Assert.assertNotNull(actualDducation)
         Assert.assertThat(actualDducation, Is.`is`(WorkExperience(id = anId, startDate = LocalDate.of(2018,1,1), endDate = null, company = "A_COMPANY", technologies = listOf("TECH_1","TECH_2"), jobDescription ="JOB_DESCRIPTION_1", commitments = listOf("COMMITMENT_1", "COMMITMENT_2"))))
     }

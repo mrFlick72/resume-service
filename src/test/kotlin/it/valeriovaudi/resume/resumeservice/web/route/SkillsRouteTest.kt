@@ -75,7 +75,6 @@ class SkillsRouteTest {
                 .expectStatus().isNoContent
 
         val block = skillsRepository.findAll(resumeId).toFlux().collectList().block()
-        println("block $block")
         Assert.assertTrue(block.orEmpty().isEmpty())
 
     }

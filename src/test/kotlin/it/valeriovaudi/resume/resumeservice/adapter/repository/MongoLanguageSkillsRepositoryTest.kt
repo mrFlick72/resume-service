@@ -44,8 +44,6 @@ class MongoLanguageSkillsRepositoryTest {
                 .block(Duration.ofMinutes(1))
         Assert.assertNotNull(save)
         Assert.assertNotNull(document)
-
-        println(document)
     }
 
     @Test
