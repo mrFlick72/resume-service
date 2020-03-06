@@ -1,8 +1,6 @@
 package it.valeriovaudi.resume.resumeservice.adapter.usecase.printer.pdf
 
 import com.itextpdf.io.image.ImageDataFactory
-import com.itextpdf.kernel.colors.Color
-import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
@@ -16,7 +14,11 @@ object CellFactory {
     fun photoCell(image: ByteArray): Cell {
         val newCell = newCell()
         if (image.isNotEmpty()) {
-            newCell.add(Image(ImageDataFactory.createJpeg(image)).setHeight(50f).setWidth(50f))
+            val createJpeg = ImageDataFactory.createJpeg(image)
+
+            newCell.add(Image(createJpeg)
+                    .scaleToFit(150f, 150f)
+            )
         }
 
         return newCell

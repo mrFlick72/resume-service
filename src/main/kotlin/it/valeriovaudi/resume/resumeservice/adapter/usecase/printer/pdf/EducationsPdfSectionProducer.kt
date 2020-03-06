@@ -29,6 +29,7 @@ class EducationsPdfSectionProducer(val dateTimeFormatter: DateTimeFormatter = Pd
                     .ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateTo", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
 
             PdfResumePrinter.newEmptyCells(table)
+            PdfResumePrinter.newEmptyCells(table)
         }
     }
 }

@@ -78,7 +78,7 @@ internal class S3PhotoRepository(@Value("\${aws.s3.bucket}") private val awsBuck
                                  private val s3Client: S3AsyncClient) {
 
     companion object {
-        fun personalDetailsBucketFolder() = "resume/personalDetails"
+        fun personalDetailsBucketFolder(resumeId: String) = "resume/personalDetails/${resumeId}.jpeg"
     }
 
     fun deletePhoto(resumeId: String) =
@@ -86,7 +86,7 @@ internal class S3PhotoRepository(@Value("\${aws.s3.bucket}") private val awsBuck
                 s3Client.deleteObject(DeleteObjectRequest
                         .builder()
                         .bucket(this.awsBucket)
-                        .key("${personalDetailsBucketFolder()}/$resumeId")
+                        .key(personalDetailsBucketFolder(resumeId))
                         .build())
             }
 
@@ -97,7 +97,7 @@ internal class S3PhotoRepository(@Value("\${aws.s3.bucket}") private val awsBuck
                         s3Client.putObject(
                                 PutObjectRequest.builder()
                                         .bucket(this.awsBucket)
-                                        .key("${personalDetailsBucketFolder()}/$resumeId")
+                                        .key(personalDetailsBucketFolder(resumeId))
                                         .build(),
                                 AsyncRequestBody.fromBytes(it)
                         )
@@ -110,7 +110,7 @@ internal class S3PhotoRepository(@Value("\${aws.s3.bucket}") private val awsBuck
             Mono.fromCompletionStage {
                 s3Client.getObject(GetObjectRequest.builder()
                         .bucket(this.awsBucket)
-                        .key("${personalDetailsBucketFolder()}/$resumeId")
+                        .key(personalDetailsBucketFolder(resumeId))
                         .build(),
                         AsyncResponseTransformer.toBytes())
             }.onErrorResume { Mono.just(ResponseBytes.fromByteArray(GetObjectResponse.builder().build(), ByteArray(0))) }
