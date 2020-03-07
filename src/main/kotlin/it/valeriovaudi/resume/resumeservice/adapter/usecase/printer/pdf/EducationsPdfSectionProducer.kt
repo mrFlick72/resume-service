@@ -23,10 +23,10 @@ class EducationsPdfSectionProducer(val dateTimeFormatter: DateTimeFormatter = Pd
             table.addCell(CellFactory.newFirstCell(label.getOrDefault("type", ""))).addCell(CellFactory.newSecondCell(education.type.name))
 
             Optional.ofNullable(education.dateFrom)
-                    .ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateFrom", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+                    .ifPresent { table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateFrom", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) }
 
             Optional.ofNullable(education.dateTo)
-                    .ifPresent({ table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateTo", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) })
+                    .ifPresent { table.addCell(CellFactory.newFirstCell(label.getOrDefault("dateTo", ""))).addCell(CellFactory.newSecondCell(dateTimeFormatter.format(it))) }
 
             PdfResumePrinter.newEmptyCells(table)
             PdfResumePrinter.newEmptyCells(table)

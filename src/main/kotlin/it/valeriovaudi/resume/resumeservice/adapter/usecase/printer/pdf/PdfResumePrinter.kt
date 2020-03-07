@@ -31,10 +31,8 @@ class PdfResumePrinter(private val resumeRepository: MongoResumeRepository,
     }
 
     override fun printResumeFor(resumeId: String): Mono<ByteArray>{
-        println("resumeId: $resumeId")
         return this.resumeRepository.findOne(resumeId).toMono()
                 .map { resume ->
-                    println(resume)
                     val pdfPath = Files.createTempFile(UUID.randomUUID().toString(), ".pdf")
 
                     Files.newOutputStream(pdfPath).use { pdfStream ->
